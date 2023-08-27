@@ -1,14 +1,10 @@
 package com.example.bookme.service.impl;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.example.bookme.config.FileSaveConstants;
-import com.example.bookme.config.JWTAuthConstants;
 import com.example.bookme.model.Property;
 import com.example.bookme.model.User;
 import com.example.bookme.model.dto.PropertyDto;
 import com.example.bookme.model.dto.PropertyEditDto;
-import com.example.bookme.model.dto.UserDetailsDto;
 import com.example.bookme.model.enumertaion.PropertyType;
 import com.example.bookme.model.exceptions.AnonymousUserException;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
@@ -19,7 +15,6 @@ import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.PropertyService;
 import com.example.bookme.utils.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +24,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/properties")
+@RequestMapping("/api/properties")
 @AllArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
@@ -47,11 +47,15 @@ public class PropertyController {
         return ResponseEntity.status(403).build();
     }
     @PostMapping("/{id}/edit")
-    public ResponseEntity<Property> edit(@PathVariable Long id,
+    public ResponseEntity<?> edit(@PathVariable Long id,
                                          Authentication authentication,
                                          @RequestBody PropertyEditDto propertyDto) throws JsonProcessingException {
-        return propertyService.edit(authentication, id, propertyDto)
-                .map(property -> ResponseEntity.ok().body(property))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        try{
+            return propertyService.edit(authentication, id, propertyDto)
+                    .map(property -> ResponseEntity.ok().body(property))
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
     }
 }
