@@ -21,6 +21,7 @@ public class Property implements Serializable {
     private String propertyName;
     private String propertyDescription;
     private String propertyCity;
+    private String propertyAddress;
     private String propertyLocation;
     @Enumerated(value = EnumType.STRING)
     private PropertyType propertyType;
@@ -35,12 +36,13 @@ public class Property implements Serializable {
     private String propertyImages;
 
     public Property(String propertyName, String propertyDescription, String propertyCity,
-                    String propertyLocation, String propertyType, Integer propertySize,
+                    String propertyLocation, String propertyAddress, String propertyType, Integer propertySize,
                     Double propertyPrice, String propertyImage, String propertyImages, User propertyUser) {
         this.propertyName = propertyName;
         this.propertyDescription = propertyDescription;
         this.propertyCity = propertyCity;
         this.propertyLocation = propertyLocation;
+        this.propertyAddress = propertyAddress;
         this.propertyType = PropertyType.valueOf(propertyType);
         this.propertySize = propertySize;
         this.propertyPrice = propertyPrice;

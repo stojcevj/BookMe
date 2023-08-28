@@ -10,15 +10,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 public interface PropertyService {
-    List<Property> findAll();
     Page<Property> findAllWithPagination(Pageable pageable);
     Optional<Property> findById(Long id);
     Optional<Property> findByName(String name);
     Optional<Property> save(PropertyDto propertyDto, MultipartFile[] images) throws IOException;
     Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException;
-    void deleteById(Long id);
+    Optional<Property> deleteById(Authentication authentication, Long id);
 }

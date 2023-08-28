@@ -35,10 +35,6 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
     @Override
-    public List<Property> findAll() {
-        return propertyRepository.findAll();
-    }
-    @Override
     public Page<Property> findAllWithPagination(Pageable pageable) {
         return propertyRepository.findAll(pageable);
     }
@@ -70,6 +66,7 @@ public class PropertyServiceImpl implements PropertyService {
         Property property = new Property(propertyDto.getPropertyName(),
                 propertyDto.getPropertyDescription(),
                 propertyDto.getPropertyCity(),
+                propertyDto.getPropertyAddress(),
                 propertyDto.getPropertyLocation(),
                 propertyDto.getPropertyType(),
                 propertyDto.getPropertySize(),
@@ -119,7 +116,19 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public Optional<Property> deleteById(Authentication authentication,
+                           Long id) {
+        Property propertyToDelete = propertyRepository.findById(id)
+                .orElseThrow(PropertyNotFoundException::new);
 
+        User authenticatedUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(propertyToDelete.getPropertyUser() != authenticatedUser){
+            throw new UserNotMatchingException();
+        }
+
+        propertyRepository.delete(propertyToDelete);
+        return Optional.of(propertyToDelete);
     }
 }

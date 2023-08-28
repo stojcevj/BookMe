@@ -22,8 +22,8 @@ public class Reservation {
     private User reservationUser;
     @ManyToOne
     private Property reservationProperty;
-    private LocalDate reservationStartDate;
-    private LocalDate reservationEndDate;
+    private LocalDateTime reservationStartDate;
+    private LocalDateTime reservationEndDate;
     private Integer reservationNumberOfPeople;
     private Double reservationTotalPrice;
 }

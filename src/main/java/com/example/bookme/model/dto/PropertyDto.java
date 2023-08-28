@@ -12,6 +12,7 @@ public class PropertyDto {
     private String propertyName;
     private String propertyDescription;
     private String propertyCity;
+    private String propertyAddress;
     private String propertyLocation;
     private String propertyType;
     private Integer propertySize;
