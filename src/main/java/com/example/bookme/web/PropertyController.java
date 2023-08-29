@@ -24,6 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
+    /*TODO dont foretttt*/
     @GetMapping
     public List<Property> getAllWithPagination(@RequestParam(required = false, name = "s") String searchString,
                                                @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,

@@ -26,5 +26,18 @@ public class Reservation {
     private LocalDateTime reservationEndDate;
     private Integer reservationNumberOfPeople;
     private Double reservationTotalPrice;
+    public Reservation(User reservationUser,
+                       Property reservationProperty,
+                       LocalDateTime reservationStartDate,
+                       LocalDateTime reservationEndDate,
+                       Integer reservationNumberOfPeople,
+                       Double reservationTotalPrice) {
+        this.reservationUser = reservationUser;
+        this.reservationProperty = reservationProperty;
+        this.reservationStartDate = reservationStartDate;
+        this.reservationEndDate = reservationEndDate;
+        this.reservationNumberOfPeople = reservationNumberOfPeople;
+        this.reservationTotalPrice = reservationTotalPrice;
+    }
 }
 
