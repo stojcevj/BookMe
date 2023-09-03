@@ -20,4 +20,5 @@ public class PropertyDto {
     private String propertyImage;
     private String propertyImages;
     private String propertyUser;
+    private MultipartFile [] images;
 }

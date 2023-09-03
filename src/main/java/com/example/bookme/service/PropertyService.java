@@ -10,12 +10,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface PropertyService {
     Page<Property> findAllWithPagination(Pageable pageable);
+    Page<Property> findAllWithCitySearch(String search, Pageable pageable);
+    Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable);
     Optional<Property> findById(Long id);
-    Optional<Property> findByName(String name);
     Optional<Property> save(PropertyDto propertyDto, MultipartFile[] images) throws IOException;
     Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException;
     Optional<Property> deleteById(Authentication authentication, Long id);

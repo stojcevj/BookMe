@@ -114,3 +114,19 @@ public class User implements UserDetails {
 //    "propertySize": 33,
 //    "propertyPrice": 123
 //}
+
+//{
+//        "reservationProperty": 5,
+//        "reservationStartDate":"2023-08-02T22:00:00.000Z",
+//        "reservationEndDate":"2023-08-03T22:00:00.000Z",
+//        "reservationNumberOfPeople": 1,
+//        "reservationTotalPrice": 5
+//}
+
+//{
+//        "firstName": "Jovan",
+//        "lastName":"Stojcev",
+//        "mobilePhone":"078702604",
+//        "email": "stojcevjovan@hotmail.com",
+//        "password": "jovance123"
+//}

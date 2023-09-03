@@ -20,29 +20,38 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/properties")
-@CrossOrigin(origins = {"http://localhost:4200"})
 @AllArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
-    /*TODO dont foretttt*/
     @GetMapping
     public List<Property> getAllWithPagination(@RequestParam(required = false, name = "s") String searchString,
                                                @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                                Pageable pageable){
+        if(searchString == null){
+            return propertyService.findAllWithPagination(pageable).getContent();
+        }
+        if(!searchString.isEmpty() && (startDate == null || endDate == null)){
+            return propertyService.findAllWithCitySearch(searchString, pageable).getContent();
+        }
+        if(!searchString.isEmpty()){
+            return propertyService.findAllWithFreeReservationDatesAndCitySearch(startDate, endDate, searchString, pageable).getContent();
+        }
+        if(startDate != null && endDate != null){
+            return propertyService.findAllWithFreeReservationDates(startDate, endDate, pageable).getContent();
+        }
         return propertyService.findAllWithPagination(pageable).getContent();
     }
 
     @PostMapping
     public ResponseEntity<?> save(Authentication authentication,
-                                         @RequestPart("data") PropertyDto propertyDto,
-                                         @RequestPart("images") MultipartFile [] images) throws IOException {
+                                  PropertyDto propertyDto) throws IOException {
         try {
             if (authentication != null) {
                 String email = authentication.getName();
                 propertyDto.setPropertyUser(email);
 
-                return propertyService.save(propertyDto, images)
+                return propertyService.save(propertyDto, propertyDto.getImages())
                         .map(property -> ResponseEntity.ok().body(property))
                         .orElseGet(() -> ResponseEntity.badRequest().build());
             }

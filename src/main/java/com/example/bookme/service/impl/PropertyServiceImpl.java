@@ -11,6 +11,7 @@ import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.model.exceptions.UserNotMatchingException;
 import com.example.bookme.repository.PropertyRepository;
+import com.example.bookme.repository.ReservationRepository;
 import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.PropertyService;
 import com.example.bookme.utils.FileUploadUtil;
@@ -24,6 +25,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -33,20 +36,55 @@ import java.util.Optional;
 public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
+
     @Override
     public Page<Property> findAllWithPagination(Pageable pageable) {
         return propertyRepository.findAll(pageable);
     }
 
     @Override
-    public Optional<Property> findById(Long id) {
-        return Optional.ofNullable(propertyRepository.findById(id)
-                .orElseThrow(PropertyNotFoundException::new));
+    public Page<Property> findAllWithCitySearch(String search, Pageable pageable) {
+        if (search.isEmpty()){
+            return propertyRepository.findAll(pageable);
+        }
+
+        return propertyRepository.findAllByPropertyCityContainingIgnoreCase(search, pageable);
     }
 
     @Override
-    public Optional<Property> findByName(String name) {
-        return Optional.ofNullable(propertyRepository.findByPropertyName(name)
+    public Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        List<Long> usedProperties = reservationRepository
+                .findAllByReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(startDate,endDate,startDate,endDate)
+                .stream()
+                .map(s -> s.getReservationProperty().getId())
+                .toList();
+
+        if(usedProperties.isEmpty()){
+            return propertyRepository.findAll(pageable);
+        }
+
+        return propertyRepository.findAllByIdNotIn(usedProperties, pageable);
+    }
+
+    @Override
+    public Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable) {
+        List<Long> usedProperties = reservationRepository
+                .findAllByReservationProperty_PropertyCityLikeIgnoreCaseAndReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(search,startDate,endDate,startDate,endDate)
+                .stream()
+                .map(s -> s.getReservationProperty().getId())
+                .toList();
+
+        if(usedProperties.isEmpty()){
+            return propertyRepository.findAllByPropertyCityContainingIgnoreCase(search, pageable);
+        }
+
+        return propertyRepository.findAllByIdNotIn(usedProperties, pageable);
+    }
+
+    @Override
+    public Optional<Property> findById(Long id) {
+        return Optional.ofNullable(propertyRepository.findById(id)
                 .orElseThrow(PropertyNotFoundException::new));
     }
 

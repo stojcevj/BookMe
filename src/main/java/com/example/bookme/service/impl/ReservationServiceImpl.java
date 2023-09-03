@@ -4,9 +4,7 @@ import com.example.bookme.model.Property;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.User;
 import com.example.bookme.model.dto.ReservationAddDto;
-import com.example.bookme.model.exceptions.PropertyNotFoundException;
-import com.example.bookme.model.exceptions.ReservationDatesAreFulfilledException;
-import com.example.bookme.model.exceptions.UserNotFoundException;
+import com.example.bookme.model.exceptions.*;
 import com.example.bookme.repository.PropertyRepository;
 import com.example.bookme.repository.ReservationRepository;
 import com.example.bookme.repository.UserRepository;
@@ -28,6 +26,12 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
+
+    @Override
+    public List<Reservation> findAll() {
+        return reservationRepository.findAll();
+    }
+
     @Override
     public Optional<Reservation> addReservation(Authentication authentication,
                                                 ReservationAddDto reservationAddDto) {
@@ -54,5 +58,21 @@ public class ReservationServiceImpl implements ReservationService {
                 reservationAddDto.getReservationTotalPrice());
 
         return Optional.of(reservationRepository.save(reservationToAdd));
+    }
+
+    @Override
+    public Optional<Reservation> deleteReservation(Long id, Authentication authentication) {
+        Reservation reservationToDelete = reservationRepository.findById(id)
+                .orElseThrow(ReservationNotFoundException::new);
+
+        User authenticatedUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(reservationToDelete.getReservationUser() != authenticatedUser){
+            throw new UserNotMatchingException();
+        }
+
+        reservationRepository.delete(reservationToDelete);
+        return Optional.of(reservationToDelete);
     }
 }
