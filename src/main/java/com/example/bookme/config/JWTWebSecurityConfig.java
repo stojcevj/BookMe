@@ -1,5 +1,6 @@
 package com.example.bookme.config;
 
+import com.example.bookme.config.filters.CustomAuthEntryPoint;
 import com.example.bookme.config.filters.JWTAuthenticationFilter;
 import com.example.bookme.config.filters.JWTAuthorizationFilter;
 import com.example.bookme.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -40,7 +42,8 @@ public class JWTWebSecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling((exception) -> exception.authenticationEntryPoint(customAuthEntryPoint()));
         return http.build();
     }
     @Bean
@@ -64,6 +67,11 @@ public class JWTWebSecurityConfig {
             }
         };
     }
+    @Bean
+    public AuthenticationEntryPoint customAuthEntryPoint(){
+        return new CustomAuthEntryPoint();
+    }
+
 }
 
 

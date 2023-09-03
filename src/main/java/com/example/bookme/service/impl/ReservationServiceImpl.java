@@ -41,6 +41,10 @@ public class ReservationServiceImpl implements ReservationService {
         Property reservationProperty = propertyRepository.findById(reservationAddDto.getReservationProperty())
                 .orElseThrow(PropertyNotFoundException::new);
 
+        if(reservationAddDto.getReservationNumberOfPeople() <= reservationProperty.getPropertySize()){
+            throw new ReservationExceedsPropertyCapacityException();
+        }
+
         List<Reservation> reservedOnTheSameDate = reservationRepository.findAllByReservationProperty(reservationProperty)
                 .stream()
                 .filter(s -> !CheckReservationDateUtil.CheckReservationDates(reservationAddDto, s))

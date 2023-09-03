@@ -4,10 +4,7 @@ import com.example.bookme.model.User;
 import com.example.bookme.model.dto.ChangePasswordDto;
 import com.example.bookme.model.dto.SignUpDto;
 import com.example.bookme.model.enumertaion.Role;
-import com.example.bookme.model.exceptions.PasswordDoNotMatchException;
-import com.example.bookme.model.exceptions.UserIdNotMatchingException;
-import com.example.bookme.model.exceptions.UserNotFoundException;
-import com.example.bookme.model.exceptions.UserNotMatchingException;
+import com.example.bookme.model.exceptions.*;
 import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.UserService;
 import com.example.bookme.utils.TokenParseUtil;
@@ -36,6 +33,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> save(SignUpDto sign) {
+        if(userRepository.findByEmail(sign.getEmail()).isPresent()){
+            throw new UserAlreadyExistsException();
+        }
+
         User user = User.builder().firstName(sign.getFirstName()).lastName(sign.getLastName())
                 .mobilePhone(sign.getMobilePhone()).email(sign.getEmail())
                 .password(passwordEncoder.encode(sign.getPassword()))

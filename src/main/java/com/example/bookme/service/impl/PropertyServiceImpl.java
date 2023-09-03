@@ -44,7 +44,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<Property> findAllWithCitySearch(String search, Pageable pageable) {
+    public Page<Property> findAllWithCitySearch(String search,
+                                                Pageable pageable) {
         if (search.isEmpty()){
             return propertyRepository.findAll(pageable);
         }
@@ -53,7 +54,9 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate,
+                                                          LocalDateTime endDate,
+                                                          Pageable pageable) {
         List<Long> usedProperties = reservationRepository
                 .findAllByReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(startDate,endDate,startDate,endDate)
                 .stream()
@@ -68,7 +71,10 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable) {
+    public Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate,
+                                                                       LocalDateTime endDate,
+                                                                       String search,
+                                                                       Pageable pageable) {
         List<Long> usedProperties = reservationRepository
                 .findAllByReservationProperty_PropertyCityLikeIgnoreCaseAndReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(search,startDate,endDate,startDate,endDate)
                 .stream()
@@ -80,6 +86,15 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         return propertyRepository.findAllByIdNotIn(usedProperties, pageable);
+    }
+
+    @Override
+    public Page<Property> findAllForUser(Authentication authentication,
+                                         Pageable pageable) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        return propertyRepository.findAllByPropertyUser(loggedInUser, pageable);
     }
 
     @Override
@@ -124,7 +139,9 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException {
+    public Optional<Property> edit(Authentication authentication,
+                                   Long id,
+                                   PropertyEditDto propertyDto) throws JsonProcessingException {
         Property propertyToEdit = propertyRepository.findById(id)
                 .orElseThrow(PropertyNotFoundException::new);
 
@@ -154,7 +171,7 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public Optional<Property> deleteById(Authentication authentication,
-                           Long id) {
+                                         Long id) {
         Property propertyToDelete = propertyRepository.findById(id)
                 .orElseThrow(PropertyNotFoundException::new);
 

@@ -1,6 +1,7 @@
 package com.example.bookme.service;
 
 import com.example.bookme.model.Property;
+import com.example.bookme.model.User;
 import com.example.bookme.model.dto.PropertyDto;
 import com.example.bookme.model.dto.PropertyEditDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,6 +19,7 @@ public interface PropertyService {
     Page<Property> findAllWithCitySearch(String search, Pageable pageable);
     Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable);
+    Page<Property> findAllForUser(Authentication authentication, Pageable pageable);
     Optional<Property> findById(Long id);
     Optional<Property> save(PropertyDto propertyDto) throws IOException;
     Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException;

@@ -32,10 +32,14 @@ public class UserController {
         }
     }
     @PostMapping("/register")
-    public ResponseEntity<User> doRegister(@RequestBody SignUpDto sign){
-        return userService.save(sign)
-                .map(user -> ResponseEntity.ok().body(user))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+    public ResponseEntity<?> doRegister(@RequestBody SignUpDto sign){
+        try{
+            return userService.save(sign)
+                    .map(user -> ResponseEntity.ok().body(user))
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
     }
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/user/edit")
