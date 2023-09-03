@@ -8,6 +8,7 @@ import com.example.bookme.service.PropertyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,7 +28,7 @@ public class PropertyController {
     public List<Property> getAllWithPagination(@RequestParam(required = false, name = "s") String searchString,
                                                @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-                                               Pageable pageable){
+                                               @PageableDefault(size = 10, page = 0) Pageable pageable){
         if(searchString == null){
             return propertyService.findAllWithPagination(pageable).getContent();
         }
