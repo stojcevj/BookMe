@@ -19,7 +19,7 @@ public interface PropertyService {
     Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
     Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable);
     Optional<Property> findById(Long id);
-    Optional<Property> save(PropertyDto propertyDto, MultipartFile[] images) throws IOException;
+    Optional<Property> save(PropertyDto propertyDto) throws IOException;
     Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException;
     Optional<Property> deleteById(Authentication authentication, Long id);
 }

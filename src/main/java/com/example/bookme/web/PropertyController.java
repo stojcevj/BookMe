@@ -52,7 +52,7 @@ public class PropertyController {
                 String email = authentication.getName();
                 propertyDto.setPropertyUser(email);
 
-                return propertyService.save(propertyDto, propertyDto.getImages())
+                return propertyService.save(propertyDto)
                         .map(property -> ResponseEntity.ok().body(property))
                         .orElseGet(() -> ResponseEntity.badRequest().build());
             }

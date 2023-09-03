@@ -89,13 +89,13 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Optional<Property> save(PropertyDto propertyDto, MultipartFile[] images) throws IOException {
+    public Optional<Property> save(PropertyDto propertyDto) throws IOException {
         User propertyUser = userRepository.findByEmail(propertyDto.getPropertyUser())
                 .orElseThrow(UserNotFoundException::new);
 
         StringBuilder propertyImages = new StringBuilder();
 
-        for(MultipartFile image : images){
+        for(MultipartFile image : propertyDto.getImages()){
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             propertyImages.append(fileName).append(";");
         }
@@ -114,7 +114,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         Property savedProperty = propertyRepository.save(property);
 
-        for(MultipartFile image : images){
+        for(MultipartFile image : propertyDto.getImages()){
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             String uploadDir = FileSaveConstants.uploadDir + "/"+ savedProperty.getId();
             FileUploadUtil.saveFile(uploadDir, fileName, image);
