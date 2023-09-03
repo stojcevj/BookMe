@@ -12,6 +12,8 @@ import com.example.bookme.service.ReservationService;
 import com.example.bookme.service.UserService;
 import com.example.bookme.utils.CheckReservationDateUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +28,13 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
-
     @Override
-    public List<Reservation> findAll() {
-        return reservationRepository.findAll();
+    public Page<Reservation> getAllReservationsForUser(Authentication authentication,
+                                                       Pageable pageable) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        return reservationRepository.findAllByReservationUser(loggedInUser, pageable);
     }
 
     @Override
@@ -65,7 +70,8 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public Optional<Reservation> deleteReservation(Long id, Authentication authentication) {
+    public Optional<Reservation> deleteReservation(Long id,
+                                                   Authentication authentication) {
         Reservation reservationToDelete = reservationRepository.findById(id)
                 .orElseThrow(ReservationNotFoundException::new);
 

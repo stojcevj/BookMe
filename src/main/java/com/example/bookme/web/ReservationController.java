@@ -1,15 +1,17 @@
 package com.example.bookme.web;
 
+import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.dto.ReservationAddDto;
-import com.example.bookme.repository.ReservationRepository;
 import com.example.bookme.service.ReservationService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservation")
@@ -39,7 +41,12 @@ public class ReservationController {
         }
     }
     @GetMapping
-    public List<Reservation> getAllReservations(){
-        return reservationService.findAll();
+    public Page<Reservation> getAllReservations(Authentication authentication,
+                                                @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
+        try{
+            return reservationService.getAllReservationsForUser(authentication, pageable);
+        }catch (Exception e){
+            return Page.empty(pageable);
+        }
     }
 }
