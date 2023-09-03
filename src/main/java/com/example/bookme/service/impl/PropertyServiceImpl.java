@@ -137,7 +137,7 @@ public class PropertyServiceImpl implements PropertyService {
         User loggedInUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
 
-        if(propertyUser ==loggedInUser){
+        if(propertyUser == loggedInUser){
             propertyToEdit.setPropertyName(propertyDto.getPropertyName());
             propertyToEdit.setPropertyDescription(propertyDto.getPropertyDescription());
             propertyToEdit.setPropertyCity(propertyDto.getPropertyCity());
