@@ -24,4 +24,6 @@ public interface PropertyService {
     Optional<Property> save(PropertyDto propertyDto) throws IOException;
     Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException;
     Optional<Property> deleteById(Authentication authentication, Long id);
+    Optional<Property> addPropertyToFavourites(Authentication authentication, Long id);
+    Optional<Property> deletePropertyFromFavourites(Authentication authentication, Long id);
 }

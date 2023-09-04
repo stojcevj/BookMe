@@ -115,11 +115,12 @@ public class PropertyServiceImpl implements PropertyService {
             propertyImages.append(fileName).append(";");
         }
 
-        Property property = new Property(propertyDto.getPropertyName(),
+        Property property = new Property(
+                propertyDto.getPropertyName(),
                 propertyDto.getPropertyDescription(),
                 propertyDto.getPropertyCity(),
-                propertyDto.getPropertyAddress(),
                 propertyDto.getPropertyLocation(),
+                propertyDto.getPropertyAddress(),
                 propertyDto.getPropertyType(),
                 propertyDto.getPropertySize(),
                 propertyDto.getPropertyPrice(),
@@ -175,14 +176,50 @@ public class PropertyServiceImpl implements PropertyService {
         Property propertyToDelete = propertyRepository.findById(id)
                 .orElseThrow(PropertyNotFoundException::new);
 
-        User authenticatedUser = userRepository.findByEmail(authentication.getName())
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
 
-        if(propertyToDelete.getPropertyUser() != authenticatedUser){
+        if(propertyToDelete.getPropertyUser() != loggedInUser){
             throw new UserNotMatchingException();
         }
 
         propertyRepository.delete(propertyToDelete);
+        return Optional.of(propertyToDelete);
+    }
+
+    @Override
+    public Optional<Property> addPropertyToFavourites(Authentication authentication, Long id) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        Property propertyToAdd = propertyRepository.findById(id)
+                .orElseThrow(PropertyNotFoundException::new);
+
+        List<Property> favourites = loggedInUser.getFavouriteList();
+        favourites.add(propertyToAdd);
+
+        loggedInUser.setFavouriteList(favourites);
+
+        userRepository.save(loggedInUser);
+
+        return Optional.of(propertyToAdd);
+    }
+
+    @Override
+    public Optional<Property> deletePropertyFromFavourites(Authentication authentication, Long id) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        Property propertyToDelete = propertyRepository.findById(id)
+                .orElseThrow(PropertyNotFoundException::new);
+
+        List<Property> newFavourites = loggedInUser.getFavouriteList();
+        newFavourites.remove(propertyToDelete);
+
+        loggedInUser.setFavouriteList(newFavourites);
+
+        userRepository.save(loggedInUser);
+
         return Optional.of(propertyToDelete);
     }
 }

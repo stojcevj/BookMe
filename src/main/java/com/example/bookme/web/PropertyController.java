@@ -100,4 +100,29 @@ public class PropertyController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/favourite")
+    public ResponseEntity<?> addPropertyToFavourites(Authentication authentication,
+                                                     @PathVariable Long id){
+        try{
+            return propertyService.addPropertyToFavourites(authentication, id)
+                    .map((property -> ResponseEntity.ok().body(property)))
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/favourite/delete")
+    public ResponseEntity<?> deletePropertyFromFavourites(Authentication authentication,
+                                                          @PathVariable Long id){
+        try{
+            return propertyService.addPropertyToFavourites(authentication, id)
+                    .map((property -> ResponseEntity.ok().body(property)))
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
 }
