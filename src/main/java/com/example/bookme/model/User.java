@@ -130,3 +130,9 @@ public class User implements UserDetails {
 //        "email": "stojcevjovan@hotmail.com",
 //        "password": "jovance123"
 //}
+
+//{
+//        "userRating": 1,
+//        "userComment":"2023-09-05T22:00:00.000Z",
+//        "reservationStartDate":"2023-09-05T22:00:00.000Z",
+//}

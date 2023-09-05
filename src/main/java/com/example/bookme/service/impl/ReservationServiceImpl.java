@@ -46,7 +46,7 @@ public class ReservationServiceImpl implements ReservationService {
         Property reservationProperty = propertyRepository.findById(reservationAddDto.getReservationProperty())
                 .orElseThrow(PropertyNotFoundException::new);
 
-        if(reservationAddDto.getReservationNumberOfPeople() <= reservationProperty.getPropertySize()){
+        if(reservationAddDto.getReservationNumberOfPeople() > reservationProperty.getPropertySize()){
             throw new ReservationExceedsPropertyCapacityException();
         }
 

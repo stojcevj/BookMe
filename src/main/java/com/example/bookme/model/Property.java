@@ -34,7 +34,6 @@ public class Property implements Serializable {
     @JsonIgnore
     private List<Reservation> reservationList;
     @OneToMany(mappedBy = "propertyRated")
-    @JsonIgnore
     private List<Rating> propertyRating;
     private String propertyImages;
 
