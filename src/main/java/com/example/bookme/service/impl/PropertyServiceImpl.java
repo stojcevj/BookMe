@@ -18,6 +18,7 @@ import com.example.bookme.utils.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -95,6 +96,14 @@ public class PropertyServiceImpl implements PropertyService {
                 .orElseThrow(UserNotFoundException::new);
 
         return propertyRepository.findAllByPropertyUser(loggedInUser, pageable);
+    }
+
+    @Override
+    public Page<Property> findAllFavouritesForUser(Authentication authentication, Pageable pageable) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        return new PageImpl<>(loggedInUser.getFavouriteList(), pageable, loggedInUser.getFavouriteList().size());
     }
 
     @Override

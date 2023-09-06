@@ -118,11 +118,17 @@ public class PropertyController {
     public ResponseEntity<?> deletePropertyFromFavourites(Authentication authentication,
                                                           @PathVariable Long id){
         try{
-            return propertyService.addPropertyToFavourites(authentication, id)
+            return propertyService.deletePropertyFromFavourites(authentication, id)
                     .map((property -> ResponseEntity.ok().body(property)))
                     .orElseGet(() -> ResponseEntity.badRequest().build());
         }catch (Exception e){
             return ResponseEntity.status(403).body(e.getMessage());
         }
+    }
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/favourites")
+    public Page<Property> getFavouritesForUser(Authentication authentication,
+                                               @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
+        return propertyService.findAllFavouritesForUser(authentication, pageable);
     }
 }
