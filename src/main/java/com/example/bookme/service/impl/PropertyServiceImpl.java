@@ -5,7 +5,6 @@ import com.example.bookme.model.Property;
 import com.example.bookme.model.User;
 import com.example.bookme.model.dto.PropertyDto;
 import com.example.bookme.model.dto.PropertyEditDto;
-import com.example.bookme.model.dto.PropertyResponse;
 import com.example.bookme.model.enumertaion.PropertyType;
 import com.example.bookme.model.exceptions.AnonymousUserException;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
@@ -31,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -57,7 +55,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<PropertyResponse> findAll(Pageable pageable,
+    public Page<Property> findAll(Pageable pageable,
                                           String search,
                                           LocalDateTime startDate,
                                           LocalDateTime endDate,
@@ -77,26 +75,24 @@ public class PropertyServiceImpl implements PropertyService {
             properties = findAllWithPagination(pageable);
         }
 
-        List<PropertyResponse> propertyResponseList;
         if(authentication != null){
-            propertyResponseList = properties.getContent().stream().map(i -> {
-                boolean isBookmarked = propertyIsBookmarkedByUser(authentication, i.getId());
-                return new PropertyResponse(i, isBookmarked);
-            }).collect(Collectors.toList());
-        }
-        else{
-            propertyResponseList = properties.getContent().stream().map(PropertyResponse::new).collect(Collectors.toList());
+            properties.stream()
+                    .forEach(i -> i.setBookmarked(propertyIsBookmarkedByUser(authentication, i.getId())));
         }
 
-
-        return new PageImpl<PropertyResponse>(propertyResponseList, pageable, propertyResponseList.size());
+        return properties;
     }
 
     @Override
-    public boolean propertyIsBookmarkedByUser(Authentication authentication, Long id){
-        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
-        Property property = propertyRepository.findById(id).orElseThrow(PropertyNotFoundException::new);
-        return user.getFavouriteList().contains(property);
+    public boolean propertyIsBookmarkedByUser(Authentication authentication,
+                                              Long id){
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(PropertyNotFoundException::new);
+
+        return loggedInUser.getFavouriteList().contains(property);
     }
 
     @Override
@@ -144,14 +140,13 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<PropertyResponse> findAllFavouritesForUser(Authentication authentication, Pageable pageable) {
+    public Page<Property> findAllFavouritesForUser(Authentication authentication, Pageable pageable) {
         User loggedInUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
 
-        List<PropertyResponse> favorites = loggedInUser.getFavouriteList()
-                .stream().map(i -> new PropertyResponse(i, true)).collect(Collectors.toList());
+        loggedInUser.getFavouriteList().forEach(i -> i.setBookmarked(true));
 
-        return new PageImpl<>(favorites, pageable, loggedInUser.getFavouriteList().size());
+        return new PageImpl<>(loggedInUser.getFavouriteList(), pageable, loggedInUser.getFavouriteList().size());
     }
 
     @Override

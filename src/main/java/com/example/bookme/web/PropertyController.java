@@ -5,7 +5,6 @@ import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Property;
 import com.example.bookme.model.dto.PropertyDto;
 import com.example.bookme.model.dto.PropertyEditDto;
-import com.example.bookme.model.dto.PropertyResponse;
 import com.example.bookme.service.PropertyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -17,11 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/properties")
@@ -42,7 +39,7 @@ public class PropertyController {
     }
 
     @GetMapping
-    public Page<PropertyResponse> getAll(Authentication authentication,
+    public Page<Property> getAll(Authentication authentication,
                                                              @RequestParam(required = false, name = "s") String searchString,
                                                              @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                              @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
@@ -123,7 +120,7 @@ public class PropertyController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/favorites")
-    public Page<PropertyResponse> getFavouritesForUser(Authentication authentication,
+    public Page<Property> getFavouritesForUser(Authentication authentication,
                                                @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         return propertyService.findAllFavouritesForUser(authentication, pageable);
     }

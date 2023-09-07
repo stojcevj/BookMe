@@ -37,6 +37,8 @@ public class Property implements Serializable {
     @JsonIgnore
     private List<Rating> propertyRating;
     private String propertyImages;
+    @Transient
+    private boolean bookmarked;
 
     public Property(String propertyName, String propertyDescription, String propertyCity,
                     String propertyLocation, String propertyAddress, String propertyType, Integer propertySize,
