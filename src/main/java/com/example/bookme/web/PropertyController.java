@@ -91,9 +91,8 @@ public class PropertyController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
-
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{id}/favourite}")
+    @PostMapping("/{id}/favourite")
     public ResponseEntity<?> addPropertyToFavourites(Authentication authentication,
                                                      @PathVariable Long id){
         try{
@@ -104,7 +103,6 @@ public class PropertyController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
-
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/favourite/delete")
     public ResponseEntity<?> deletePropertyFromFavourites(Authentication authentication,
@@ -117,7 +115,6 @@ public class PropertyController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
-
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/favourites")
     public Page<Property> getFavouritesForUser(Authentication authentication,
