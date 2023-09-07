@@ -93,7 +93,7 @@ public class PropertyController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/favorite/{id}")
+    @PostMapping("/{id}/favourite}")
     public ResponseEntity<?> addPropertyToFavourites(Authentication authentication,
                                                      @PathVariable Long id){
         try{
@@ -106,7 +106,7 @@ public class PropertyController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("favorite/delete/{id}")
+    @PostMapping("/{id}/favourite/delete")
     public ResponseEntity<?> deletePropertyFromFavourites(Authentication authentication,
                                                           @PathVariable Long id){
         try{
@@ -119,7 +119,7 @@ public class PropertyController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/favorites")
+    @GetMapping("/favourites")
     public Page<Property> getFavouritesForUser(Authentication authentication,
                                                @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         return propertyService.findAllFavouritesForUser(authentication, pageable);
