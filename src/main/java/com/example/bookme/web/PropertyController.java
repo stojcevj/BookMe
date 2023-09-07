@@ -5,6 +5,7 @@ import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Property;
 import com.example.bookme.model.dto.PropertyDto;
 import com.example.bookme.model.dto.PropertyEditDto;
+import com.example.bookme.model.dto.PropertyResponse;
 import com.example.bookme.service.PropertyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -25,27 +26,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/properties")
 @AllArgsConstructor
+@CrossOrigin("*")
 public class PropertyController {
     private final PropertyService propertyService;
-    @GetMapping
-    public Page<Property> getAllWithPagination(@RequestParam(required = false, name = "s") String searchString,
-                                               @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                               @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-                                               @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
-        if(searchString == null){
-            return propertyService.findAllWithPagination(pageable);
-        }
-        if(!searchString.isEmpty() && (startDate == null || endDate == null)){
-            return propertyService.findAllWithCitySearch(searchString, pageable);
-        }
-        if(!searchString.isEmpty()){
-            return propertyService.findAllWithFreeReservationDatesAndCitySearch(startDate, endDate, searchString, pageable);
-        }
-        if(startDate != null && endDate != null){
-            return propertyService.findAllWithFreeReservationDates(startDate, endDate, pageable);
-        }
-        return propertyService.findAllWithPagination(pageable);
-    }
+
     @GetMapping("/user")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getAllPropertiesForUser(Authentication authentication,
@@ -56,6 +40,16 @@ public class PropertyController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
+
+    @GetMapping
+    public Page<PropertyResponse> getAll(Authentication authentication,
+                                                             @RequestParam(required = false, name = "s") String searchString,
+                                                             @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                             @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                             @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
+        return propertyService.findAll(pageable, searchString, startDate, endDate, authentication);
+    }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> save(Authentication authentication,
@@ -100,8 +94,9 @@ public class PropertyController {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
+
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{id}/favourite")
+    @PostMapping("/favorite/{id}")
     public ResponseEntity<?> addPropertyToFavourites(Authentication authentication,
                                                      @PathVariable Long id){
         try{
@@ -114,15 +109,22 @@ public class PropertyController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("/{id}/favourite/delete")
+    @PostMapping("favorite/delete/{id}")
     public ResponseEntity<?> deletePropertyFromFavourites(Authentication authentication,
                                                           @PathVariable Long id){
         try{
-            return propertyService.addPropertyToFavourites(authentication, id)
+            return propertyService.deletePropertyFromFavourites(authentication, id)
                     .map((property -> ResponseEntity.ok().body(property)))
                     .orElseGet(() -> ResponseEntity.badRequest().build());
         }catch (Exception e){
             return ResponseEntity.status(403).body(e.getMessage());
         }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/favorites")
+    public Page<PropertyResponse> getFavouritesForUser(Authentication authentication,
+                                               @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
+        return propertyService.findAllFavouritesForUser(authentication, pageable);
     }
 }

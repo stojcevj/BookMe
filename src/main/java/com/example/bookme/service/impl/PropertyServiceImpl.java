@@ -5,6 +5,7 @@ import com.example.bookme.model.Property;
 import com.example.bookme.model.User;
 import com.example.bookme.model.dto.PropertyDto;
 import com.example.bookme.model.dto.PropertyEditDto;
+import com.example.bookme.model.dto.PropertyResponse;
 import com.example.bookme.model.enumertaion.PropertyType;
 import com.example.bookme.model.exceptions.AnonymousUserException;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
@@ -18,6 +19,7 @@ import com.example.bookme.utils.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -51,6 +54,49 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         return propertyRepository.findAllByPropertyCityContainingIgnoreCase(search, pageable);
+    }
+
+    @Override
+    public Page<PropertyResponse> findAll(Pageable pageable,
+                                          String search,
+                                          LocalDateTime startDate,
+                                          LocalDateTime endDate,
+                                          Authentication authentication) {
+        Page<Property> properties;
+
+        if(search != null && startDate != null && endDate != null){
+            properties = findAllWithFreeReservationDatesAndCitySearch(startDate, endDate, search, pageable);
+        }
+        else if(startDate != null && endDate != null){
+            properties = findAllWithFreeReservationDates(startDate, endDate, pageable);
+        }
+        else if(search != null){
+            properties = findAllWithCitySearch(search, pageable);
+        }
+        else{
+            properties = findAllWithPagination(pageable);
+        }
+
+        List<PropertyResponse> propertyResponseList;
+        if(authentication != null){
+            propertyResponseList = properties.getContent().stream().map(i -> {
+                boolean isBookmarked = propertyIsBookmarkedByUser(authentication, i.getId());
+                return new PropertyResponse(i, isBookmarked);
+            }).collect(Collectors.toList());
+        }
+        else{
+            propertyResponseList = properties.getContent().stream().map(PropertyResponse::new).collect(Collectors.toList());
+        }
+
+
+        return new PageImpl<PropertyResponse>(propertyResponseList, pageable, propertyResponseList.size());
+    }
+
+    @Override
+    public boolean propertyIsBookmarkedByUser(Authentication authentication, Long id){
+        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
+        Property property = propertyRepository.findById(id).orElseThrow(PropertyNotFoundException::new);
+        return user.getFavouriteList().contains(property);
     }
 
     @Override
@@ -95,6 +141,17 @@ public class PropertyServiceImpl implements PropertyService {
                 .orElseThrow(UserNotFoundException::new);
 
         return propertyRepository.findAllByPropertyUser(loggedInUser, pageable);
+    }
+
+    @Override
+    public Page<PropertyResponse> findAllFavouritesForUser(Authentication authentication, Pageable pageable) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        List<PropertyResponse> favorites = loggedInUser.getFavouriteList()
+                .stream().map(i -> new PropertyResponse(i, true)).collect(Collectors.toList());
+
+        return new PageImpl<>(favorites, pageable, loggedInUser.getFavouriteList().size());
     }
 
     @Override

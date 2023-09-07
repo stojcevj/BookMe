@@ -36,7 +36,7 @@ public class JWTWebSecurityConfig {
                 .addFilterBefore(new JWTAuthenticationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), userService, passwordEncoder), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTAuthorizationFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)), userService), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(new AntPathRequestMatcher("/api/properties"),
+                        .requestMatchers(new AntPathRequestMatcher("/api/properties/**"),
                                 new AntPathRequestMatcher("/api/auth/**"),
                                 new AntPathRequestMatcher("/api/images/**"))
                         .permitAll()
@@ -71,6 +71,21 @@ public class JWTWebSecurityConfig {
     public AuthenticationEntryPoint customAuthEntryPoint(){
         return new CustomAuthEntryPoint();
     }
+
+
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")  // Allow CORS for specific API paths
+//                        .allowedOrigins("http://localhost:4200")  // Specify the allowed origin
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE")  // Specify the allowed HTTP methods
+//                        .allowedHeaders("Authorization", "Content-Type")  // Specify the allowed headers
+//                        .allowCredentials(true);  // Allow sending cookies with the request (if needed)
+//            }
+//        };
+//    }
 
 }
 
