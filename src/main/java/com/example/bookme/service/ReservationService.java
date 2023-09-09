@@ -1,12 +1,11 @@
 package com.example.bookme.service;
 
 import com.example.bookme.model.Reservation;
-import com.example.bookme.model.dto.ReservationAddDto;
+import com.example.bookme.model.dtos.ReservationAddDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ReservationService {

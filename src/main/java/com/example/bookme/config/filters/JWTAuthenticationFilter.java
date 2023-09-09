@@ -1,15 +1,12 @@
 package com.example.bookme.config.filters;
 
-import ch.qos.logback.classic.encoder.JsonEncoder;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.bookme.config.JWTAuthConstants;
 import com.example.bookme.model.User;
-import com.example.bookme.model.dto.UserDetailsDto;
+import com.example.bookme.model.dtos.UserDetailsDto;
 import com.example.bookme.model.exceptions.PasswordsDoNotMatchException;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

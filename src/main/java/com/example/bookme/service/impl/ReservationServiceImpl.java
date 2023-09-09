@@ -3,13 +3,12 @@ package com.example.bookme.service.impl;
 import com.example.bookme.model.Property;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.User;
-import com.example.bookme.model.dto.ReservationAddDto;
+import com.example.bookme.model.dtos.ReservationAddDto;
 import com.example.bookme.model.exceptions.*;
 import com.example.bookme.repository.PropertyRepository;
 import com.example.bookme.repository.ReservationRepository;
 import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.ReservationService;
-import com.example.bookme.service.UserService;
 import com.example.bookme.utils.CheckReservationDateUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,10 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor

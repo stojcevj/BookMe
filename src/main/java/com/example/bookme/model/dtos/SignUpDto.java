@@ -1,4 +1,4 @@
-package com.example.bookme.model.dto;
+package com.example.bookme.model.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,7 @@
-package com.example.bookme.model.dto;
+package com.example.bookme.model.dtos;
 
 import com.example.bookme.model.User;
-import com.example.bookme.model.enumertaion.Role;
+import com.example.bookme.model.enumerations.Role;
 import lombok.Data;
 
 @Data

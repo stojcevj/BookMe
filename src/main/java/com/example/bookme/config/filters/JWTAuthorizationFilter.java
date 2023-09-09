@@ -3,7 +3,7 @@ package com.example.bookme.config.filters;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.bookme.config.JWTAuthConstants;
-import com.example.bookme.model.dto.UserDetailsDto;
+import com.example.bookme.model.dtos.UserDetailsDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;

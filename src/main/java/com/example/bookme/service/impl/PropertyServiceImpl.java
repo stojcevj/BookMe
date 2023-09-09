@@ -3,13 +3,14 @@ package com.example.bookme.service.impl;
 import com.example.bookme.config.FileSaveConstants;
 import com.example.bookme.model.Property;
 import com.example.bookme.model.User;
-import com.example.bookme.model.dto.PropertyDto;
-import com.example.bookme.model.dto.PropertyEditDto;
-import com.example.bookme.model.enumertaion.PropertyType;
+import com.example.bookme.model.dtos.PropertyDto;
+import com.example.bookme.model.dtos.PropertyEditDto;
+import com.example.bookme.model.enumerations.PropertyType;
 import com.example.bookme.model.exceptions.AnonymousUserException;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.model.exceptions.UserNotMatchingException;
+import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.repository.PropertyRepository;
 import com.example.bookme.repository.ReservationRepository;
 import com.example.bookme.repository.UserRepository;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -40,27 +42,27 @@ public class PropertyServiceImpl implements PropertyService {
     private final ReservationRepository reservationRepository;
 
     @Override
-    public Page<Property> findAllWithPagination(Pageable pageable) {
-        return propertyRepository.findAll(pageable);
+    public Page<PropertyProjection> findAllWithPagination(Pageable pageable) {
+        return propertyRepository.findAllWithProjection(pageable);
     }
 
     @Override
-    public Page<Property> findAllWithCitySearch(String search,
+    public Page<PropertyProjection> findAllWithCitySearch(String search,
                                                 Pageable pageable) {
         if (search.isEmpty()){
-            return propertyRepository.findAll(pageable);
+            return propertyRepository.findAllWithProjection(pageable);
         }
 
         return propertyRepository.findAllByPropertyCityContainingIgnoreCase(search, pageable);
     }
 
     @Override
-    public Page<Property> findAll(Pageable pageable,
+    public Page<PropertyProjection> findAll(Pageable pageable,
                                           String search,
                                           LocalDateTime startDate,
                                           LocalDateTime endDate,
                                           Authentication authentication) {
-        Page<Property> properties;
+        Page<PropertyProjection> properties;
 
         if(search != null && startDate != null && endDate != null){
             properties = findAllWithFreeReservationDatesAndCitySearch(startDate, endDate, search, pageable);
@@ -76,8 +78,69 @@ public class PropertyServiceImpl implements PropertyService {
         }
 
         if(authentication != null){
-            properties.stream()
-                    .forEach(i -> i.setBookmarked(propertyIsBookmarkedByUser(authentication, i.getId())));
+            return new PageImpl<>(properties.stream()
+                    .map(property -> new PropertyProjection() {
+                        @Override
+                        public Long getId() {
+                            return property.getId();
+                        }
+
+                        @Override
+                        public String getProperty_name() {
+                            return property.getProperty_name();
+                        }
+
+                        @Override
+                        public String getProperty_description() {
+                            return property.getProperty_description();
+                        }
+
+                        @Override
+                        public String getProperty_city() {
+                            return property.getProperty_city();
+                        }
+
+                        @Override
+                        public String getProperty_address() {
+                            return property.getProperty_address();
+                        }
+
+                        @Override
+                        public String getProperty_location() {
+                            return property.getProperty_location();
+                        }
+
+                        @Override
+                        public String getProperty_type() {
+                            return property.getProperty_type();
+                        }
+
+                        @Override
+                        public Integer getProperty_size() {
+                            return property.getProperty_size();
+                        }
+
+                        @Override
+                        public Double getProperty_price() {
+                            return property.getProperty_price();
+                        }
+
+                        @Override
+                        public String getProperty_image() {
+                            return property.getProperty_image();
+                        }
+
+                        @Override
+                        public String getProperty_images() {
+                            return property.getProperty_images();
+                        }
+
+                        @Override
+                        public Boolean getBookmarked() {
+                            return propertyIsBookmarkedByUser(authentication, property.getId());
+                        }
+                    })
+                    .collect(Collectors.toList()), pageable, properties.getSize());
         }
 
         return properties;
@@ -96,7 +159,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate,
+    public Page<PropertyProjection> findAllWithFreeReservationDates(LocalDateTime startDate,
                                                           LocalDateTime endDate,
                                                           Pageable pageable) {
         List<Long> usedProperties = reservationRepository
@@ -106,14 +169,14 @@ public class PropertyServiceImpl implements PropertyService {
                 .toList();
 
         if(usedProperties.isEmpty()){
-            return propertyRepository.findAll(pageable);
+            return propertyRepository.findAllWithProjection(pageable);
         }
 
         return propertyRepository.findAllByIdNotIn(usedProperties, pageable);
     }
 
     @Override
-    public Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate,
+    public Page<PropertyProjection> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate,
                                                                        LocalDateTime endDate,
                                                                        String search,
                                                                        Pageable pageable) {
@@ -131,12 +194,12 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Page<Property> findAllForUser(Authentication authentication,
+    public Page<PropertyProjection> findAllForUser(Authentication authentication,
                                          Pageable pageable) {
         User loggedInUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
 
-        return propertyRepository.findAllByPropertyUser(loggedInUser, pageable);
+        return propertyRepository.findAllByPropertyUser(loggedInUser.getId(), pageable);
     }
 
     @Override
@@ -148,7 +211,6 @@ public class PropertyServiceImpl implements PropertyService {
 
         return new PageImpl<>(loggedInUser.getFavouriteList(), pageable, loggedInUser.getFavouriteList().size());
     }
-
     @Override
     public Optional<Property> findById(Long id) {
         return Optional.ofNullable(propertyRepository.findById(id)

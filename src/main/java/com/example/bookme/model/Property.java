@@ -1,6 +1,6 @@
 package com.example.bookme.model;
 
-import com.example.bookme.model.enumertaion.PropertyType;
+import com.example.bookme.model.enumerations.PropertyType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

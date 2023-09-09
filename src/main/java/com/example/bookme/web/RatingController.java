@@ -1,13 +1,10 @@
 package com.example.bookme.web;
 
-import com.example.bookme.model.User;
-import com.example.bookme.model.dto.RatingDto;
+import com.example.bookme.model.dtos.RatingDto;
 import com.example.bookme.service.RatingService;
-import com.example.bookme.service.ReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

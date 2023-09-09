@@ -2,7 +2,7 @@ package com.example.bookme.web;
 
 import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Reservation;
-import com.example.bookme.model.dto.ReservationAddDto;
+import com.example.bookme.model.dtos.ReservationAddDto;
 import com.example.bookme.service.ReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;

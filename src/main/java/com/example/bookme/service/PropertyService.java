@@ -1,8 +1,9 @@
 package com.example.bookme.service;
 
 import com.example.bookme.model.Property;
-import com.example.bookme.model.dto.PropertyDto;
-import com.example.bookme.model.dto.PropertyEditDto;
+import com.example.bookme.model.dtos.PropertyDto;
+import com.example.bookme.model.dtos.PropertyEditDto;
+import com.example.bookme.model.projections.PropertyProjection;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +14,12 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface PropertyService {
-    Page<Property> findAllWithPagination(Pageable pageable);
-    Page<Property> findAllWithCitySearch(String search, Pageable pageable);
-    Page<Property> findAll(Pageable pageable, String search, LocalDateTime startDate, LocalDateTime endDate, Authentication authentication);
-    Page<Property> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
-    Page<Property> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable);
-    Page<Property> findAllForUser(Authentication authentication, Pageable pageable);
+    Page<PropertyProjection> findAllWithPagination(Pageable pageable);
+    Page<PropertyProjection> findAllWithCitySearch(String search, Pageable pageable);
+    Page<PropertyProjection> findAll(Pageable pageable, String search, LocalDateTime startDate, LocalDateTime endDate, Authentication authentication);
+    Page<PropertyProjection> findAllWithFreeReservationDates(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<PropertyProjection> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable);
+    Page<PropertyProjection> findAllForUser(Authentication authentication, Pageable pageable);
     Page<Property> findAllFavouritesForUser(Authentication authentication, Pageable pageable);
     Optional<Property> findById(Long id);
     Optional<Property> save(PropertyDto propertyDto) throws IOException;

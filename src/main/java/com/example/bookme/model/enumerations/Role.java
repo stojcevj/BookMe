@@ -1,4 +1,4 @@
-package com.example.bookme.model.enumertaion;
+package com.example.bookme.model.enumerations;
 
 import org.springframework.security.core.GrantedAuthority;
 

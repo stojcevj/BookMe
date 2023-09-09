@@ -3,8 +3,9 @@ package com.example.bookme.web;
 
 import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Property;
-import com.example.bookme.model.dto.PropertyDto;
-import com.example.bookme.model.dto.PropertyEditDto;
+import com.example.bookme.model.dtos.PropertyDto;
+import com.example.bookme.model.dtos.PropertyEditDto;
+import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.service.PropertyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
@@ -39,11 +40,11 @@ public class PropertyController {
     }
 
     @GetMapping
-    public Page<Property> getAll(Authentication authentication,
-                                                             @RequestParam(required = false, name = "s") String searchString,
-                                                             @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                             @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-                                                             @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
+    public Page<PropertyProjection> getAll(Authentication authentication,
+                                           @RequestParam(required = false, name = "s") String searchString,
+                                           @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                           @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                           @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         return propertyService.findAll(pageable, searchString, startDate, endDate, authentication);
     }
 

@@ -1,4 +1,4 @@
-package com.example.bookme.model.enumertaion;
+package com.example.bookme.model.enumerations;
 
 public enum PropertyType {
     APARTMENT,

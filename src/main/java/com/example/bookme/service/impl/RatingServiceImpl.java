@@ -4,7 +4,7 @@ import com.example.bookme.model.Property;
 import com.example.bookme.model.Rating;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.User;
-import com.example.bookme.model.dto.RatingDto;
+import com.example.bookme.model.dtos.RatingDto;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.exceptions.ReservationNotFoundException;
 import com.example.bookme.model.exceptions.UserNotFoundException;

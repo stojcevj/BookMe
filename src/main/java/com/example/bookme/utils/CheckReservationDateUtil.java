@@ -1,7 +1,7 @@
 package com.example.bookme.utils;
 
 import com.example.bookme.model.Reservation;
-import com.example.bookme.model.dto.ReservationAddDto;
+import com.example.bookme.model.dtos.ReservationAddDto;
 
 public class CheckReservationDateUtil {
     public static boolean CheckReservationDates(ReservationAddDto reservationAddDto,

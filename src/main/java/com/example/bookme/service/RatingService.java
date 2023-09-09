@@ -1,7 +1,7 @@
 package com.example.bookme.service;
 
 import com.example.bookme.model.Rating;
-import com.example.bookme.model.dto.RatingDto;
+import com.example.bookme.model.dtos.RatingDto;
 import org.springframework.security.core.Authentication;
 
 import java.util.Optional;

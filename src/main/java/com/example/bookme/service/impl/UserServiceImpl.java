@@ -1,16 +1,15 @@
 package com.example.bookme.service.impl;
 
 import com.example.bookme.model.User;
-import com.example.bookme.model.dto.ChangePasswordDto;
-import com.example.bookme.model.dto.SignUpDto;
-import com.example.bookme.model.enumertaion.Role;
+import com.example.bookme.model.dtos.ChangePasswordDto;
+import com.example.bookme.model.dtos.SignUpDto;
+import com.example.bookme.model.enumerations.Role;
 import com.example.bookme.model.exceptions.*;
 import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.UserService;
 import com.example.bookme.utils.TokenParseUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
