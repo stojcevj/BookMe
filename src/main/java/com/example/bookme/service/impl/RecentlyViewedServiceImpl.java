@@ -9,8 +9,10 @@ import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.repository.PropertyRepository;
 import com.example.bookme.repository.RecentlyViewedRepository;
 import com.example.bookme.repository.UserRepository;
+import com.example.bookme.service.PropertyService;
 import com.example.bookme.service.RecentlyViewedService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -25,20 +27,31 @@ public class RecentlyViewedServiceImpl implements RecentlyViewedService {
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
 
+    private final PropertyService propertyService;
+
 
     public RecentlyViewedServiceImpl(RecentlyViewedRepository recentlyViewedRepository,
                                      UserRepository userRepository,
-                                     PropertyRepository propertyRepository) {
+                                     PropertyRepository propertyRepository,
+                                     PropertyService propertyService) {
         this.recentlyViewedRepository = recentlyViewedRepository;
         this.userRepository = userRepository;
         this.propertyRepository = propertyRepository;
+        this.propertyService = propertyService;
     }
 
     @Override
     public Page<RecentlyViewed> findAll(Authentication authentication, Pageable pageable) {
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
-        return recentlyViewedRepository.findByUserOrderByViewedAtDesc(user, pageable);
+
+        List<RecentlyViewed> properties = recentlyViewedRepository
+                .findByUserOrderByViewedAtDesc(user, pageable).getContent();
+
+        properties
+                .forEach(i -> i.getProperty().setBookmarked(propertyService.propertyIsBookmarkedByUser(authentication, i.getProperty().getId())));
+
+        return new PageImpl<RecentlyViewed>(properties, pageable, properties.size());
     }
 
     @Override
