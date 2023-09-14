@@ -30,15 +30,20 @@ public class PropertyController {
 
     @GetMapping("/user")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getAllPropertiesForUser(Authentication authentication,
+    public Page<PropertyProjection> getAllPropertiesForUser(Authentication authentication,
                                                @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         try{
-            return ResponseEntity.ok().body(propertyService.findAllForUser(authentication, pageable).getContent());
+            return propertyService.findAllForUser(authentication, pageable);
         }catch (Exception e){
-            return ResponseEntity.status(403).body(e.getMessage());
+            return Page.empty();
         }
     }
-
+    @GetMapping("{id}")
+    public ResponseEntity<Property> getPropertyById(@PathVariable Long id){
+        return propertyService.findById(id)
+                .map(property -> ResponseEntity.ok().body(property))
+                .orElse(ResponseEntity.status(404).build());
+    }
     @GetMapping
     public Page<PropertyProjection> getAll(Authentication authentication,
                                            @RequestParam(required = false, name = "s") String searchString,
@@ -47,7 +52,6 @@ public class PropertyController {
                                            @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         return propertyService.findAll(pageable, searchString, startDate, endDate, authentication);
     }
-
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> save(Authentication authentication,
