@@ -29,12 +29,6 @@ import java.time.LocalDateTime;
 public class PropertyController {
     private final PropertyService propertyService;
 
-    @GetMapping("{id}")
-    public ResponseEntity<Property> getPropertyById(@PathVariable Long id){
-        return propertyService.findById(id)
-                .map(property -> ResponseEntity.ok().body(property))
-                .orElseThrow(PropertyNotFoundException::new);
-    }
     @GetMapping("/user")
     @PreAuthorize("isAuthenticated()")
     public Page<PropertyProjection> getAllPropertiesForUser(Authentication authentication,
