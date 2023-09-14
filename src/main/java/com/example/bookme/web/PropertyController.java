@@ -8,6 +8,7 @@ import com.example.bookme.model.dtos.PropertyEditDto;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.service.PropertyService;
+import com.example.bookme.service.RecentlyViewedService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,6 @@ import java.time.LocalDateTime;
 @CrossOrigin("*")
 public class PropertyController {
     private final PropertyService propertyService;
-
     @GetMapping("/user")
     @PreAuthorize("isAuthenticated()")
     public Page<PropertyProjection> getAllPropertiesForUser(Authentication authentication,

@@ -4,6 +4,7 @@ import com.example.bookme.model.Property;
 import com.example.bookme.model.RecentlyViewed;
 import com.example.bookme.model.User;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
+import com.example.bookme.model.exceptions.RecentlyViewedNotFoundException;
 import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.repository.PropertyRepository;
 import com.example.bookme.repository.RecentlyViewedRepository;
@@ -35,18 +36,20 @@ public class RecentlyViewedServiceImpl implements RecentlyViewedService {
 
     @Override
     public Page<RecentlyViewed> findAll(Authentication authentication, Pageable pageable) {
-        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
-
-        return recentlyViewedRepository.findByUser(user, pageable);
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+        return recentlyViewedRepository.findByUserOrderByViewedAtDesc(user, pageable);
     }
 
     @Override
     public Optional<RecentlyViewed> save(Authentication authentication, Long propertyId) {
-        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
-        Property property = propertyRepository.findById(propertyId).orElseThrow(PropertyNotFoundException::new);
-
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(PropertyNotFoundException::new);
         RecentlyViewed recentlyViewed = recentlyViewedRepository
-                .findByUserAndProperty(user, property).orElse(null);
+                .findByUserAndProperty(user, property)
+                .orElse(null);
 
         if(recentlyViewed != null){
             recentlyViewed.updateDateTime();
@@ -60,8 +63,9 @@ public class RecentlyViewedServiceImpl implements RecentlyViewedService {
 
     @Override
     public boolean removeAll(Authentication authentication) {
-//        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(UserNotFoundException::new);
-//        recentlyViewedRepository.deleteAll(recentlyViewedRepository.findByUser(user));
+      //  User user = userRepository.findByEmail(authentication.getName())
+      //          .orElseThrow(UserNotFoundException::new);
+      //  recentlyViewedRepository.deleteAll(recentlyViewedRepository.findByUser(user));
         return true;
     }
 

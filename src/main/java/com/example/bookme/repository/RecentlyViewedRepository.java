@@ -14,5 +14,5 @@ import java.util.Optional;
 @Repository
 public interface RecentlyViewedRepository extends JpaRepository<RecentlyViewed, Long> {
     Optional<RecentlyViewed> findByUserAndProperty(User user, Property property);
-    Page<RecentlyViewed> findByUser(User user, Pageable pageable);
+    Page<RecentlyViewed> findByUserOrderByViewedAtDesc(User user, Pageable pageable);
 }
