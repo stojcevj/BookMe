@@ -5,6 +5,7 @@ import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Property;
 import com.example.bookme.model.dtos.PropertyDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
+import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.service.PropertyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,14 +29,20 @@ import java.time.LocalDateTime;
 public class PropertyController {
     private final PropertyService propertyService;
 
+    @GetMapping("{id}")
+    public ResponseEntity<Property> getPropertyById(@PathVariable Long id){
+        return propertyService.findById(id)
+                .map(property -> ResponseEntity.ok().body(property))
+                .orElseThrow(PropertyNotFoundException::new);
+    }
     @GetMapping("/user")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getAllPropertiesForUser(Authentication authentication,
+    public Page<PropertyProjection> getAllPropertiesForUser(Authentication authentication,
                                                @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         try{
-            return ResponseEntity.ok().body(propertyService.findAllForUser(authentication, pageable).getContent());
+            return propertyService.findAllForUser(authentication, pageable);
         }catch (Exception e){
-            return ResponseEntity.status(403).body(e.getMessage());
+            return Page.empty();
         }
     }
 

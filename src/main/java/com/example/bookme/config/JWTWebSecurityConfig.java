@@ -38,7 +38,9 @@ public class JWTWebSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(new AntPathRequestMatcher("/api/properties/**"),
                                 new AntPathRequestMatcher("/api/auth/**"),
-                                new AntPathRequestMatcher("/api/images/**"))
+                                new AntPathRequestMatcher("/api/images/**"),
+                                new AntPathRequestMatcher("/api/recently-viewed/**"))
+
                         .permitAll()
                         .anyRequest()
                         .authenticated())
