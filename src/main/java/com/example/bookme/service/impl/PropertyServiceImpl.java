@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -140,7 +142,7 @@ public class PropertyServiceImpl implements PropertyService {
                             return propertyIsBookmarkedByUser(authentication, property.getId());
                         }
                     })
-                    .collect(Collectors.toList()), pageable, properties.getSize());
+                    .collect(Collectors.toList()), pageable, properties.getTotalElements());
         }
 
         return properties;

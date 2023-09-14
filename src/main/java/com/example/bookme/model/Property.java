@@ -19,6 +19,7 @@ public class Property implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String propertyName;
+    @Column(columnDefinition = "TEXT")
     private String propertyDescription;
     private String propertyCity;
     private String propertyAddress;
