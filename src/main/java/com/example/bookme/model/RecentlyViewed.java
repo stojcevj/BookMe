@@ -17,7 +17,7 @@ public class RecentlyViewed {
     @ManyToOne
     @JsonIgnore
     private User user;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Property property;
     private LocalDateTime viewedAt;
     public RecentlyViewed(User user, Property property) {

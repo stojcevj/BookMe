@@ -31,18 +31,21 @@ public class Property implements Serializable {
     private String propertyImage;
     @ManyToOne
     private User propertyUser;
-    @OneToMany(mappedBy = "reservationProperty")
-    @JsonIgnore
+    @OneToMany(mappedBy = "reservationProperty", cascade = CascadeType.ALL)
     private List<Reservation> reservationList;
-    @OneToMany(mappedBy = "propertyRated")
+    @OneToMany(mappedBy = "propertyRated", cascade = CascadeType.ALL)
     private List<Rating> propertyRating;
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<RecentlyViewed> propertyRecentlyViewed;
     private String propertyImages;
+    private String propertyAmenities;
     @Transient
     private boolean bookmarked;
 
     public Property(String propertyName, String propertyDescription, String propertyCity,
                     String propertyLocation, String propertyAddress, String propertyType, Integer propertySize,
-                    Double propertyPrice, String propertyImage, String propertyImages, User propertyUser) {
+                    Double propertyPrice, String propertyImage, String propertyImages, User propertyUser, String propertyAmenities) {
         this.propertyName = propertyName;
         this.propertyDescription = propertyDescription;
         this.propertyCity = propertyCity;
@@ -54,6 +57,7 @@ public class Property implements Serializable {
         this.propertyImage = propertyImage;
         this.propertyImages = propertyImages;
         this.propertyUser = propertyUser;
+        this.propertyAmenities = propertyAmenities;
     }
 }
 

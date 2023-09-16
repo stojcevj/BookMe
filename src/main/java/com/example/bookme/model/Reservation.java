@@ -1,5 +1,6 @@
 package com.example.bookme.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,8 @@ public class Reservation {
     private Long id;
     @ManyToOne
     private User reservationUser;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
     private Property reservationProperty;
     private LocalDateTime reservationStartDate;
     private LocalDateTime reservationEndDate;

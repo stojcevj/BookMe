@@ -3,12 +3,10 @@ package com.example.bookme.web;
 
 import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Property;
-import com.example.bookme.model.dtos.PropertyDto;
+import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
-import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.service.PropertyService;
-import com.example.bookme.service.RecentlyViewedService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -56,21 +54,14 @@ public class PropertyController {
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> save(Authentication authentication,
-                                  PropertyDto propertyDto) throws IOException {
+                                  PropertySaveDto propertySaveDto) throws IOException {
         try {
-            if (authentication != null) {
-                String email = authentication.getName();
-                propertyDto.setPropertyUser(email);
-
-                return propertyService.save(propertyDto)
-                        .map(property -> ResponseEntity.ok().body(property))
-                        .orElseGet(() -> ResponseEntity.badRequest().build());
-            }
+            return propertyService.save(propertySaveDto, authentication)
+                    .map(property -> ResponseEntity.ok().body(property))
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
         }catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
-
-        return ResponseEntity.status(403).build();
     }
     @PutMapping("/{id}/edit")
     @PreAuthorize("isAuthenticated()")
@@ -79,6 +70,18 @@ public class PropertyController {
                                          @RequestBody PropertyEditDto propertyDto) throws JsonProcessingException {
         try{
             return propertyService.edit(authentication, id, propertyDto)
+                    .map(property -> ResponseEntity.ok().body(property))
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        }catch (Exception e){
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
+    @GetMapping("/{id}/edit")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getEditData(@PathVariable Long id,
+                                         Authentication authentication){
+        try {
+            return propertyService.getEditDetails(id, authentication)
                     .map(property -> ResponseEntity.ok().body(property))
                     .orElseGet(() -> ResponseEntity.badRequest().build());
         }catch (Exception e){

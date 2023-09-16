@@ -2,16 +2,20 @@ package com.example.bookme.service.impl;
 
 import com.example.bookme.config.FileSaveConstants;
 import com.example.bookme.model.Property;
+import com.example.bookme.model.RecentlyViewed;
+import com.example.bookme.model.Reservation;
 import com.example.bookme.model.User;
-import com.example.bookme.model.dtos.PropertyDto;
+import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
 import com.example.bookme.model.enumerations.PropertyType;
 import com.example.bookme.model.exceptions.AnonymousUserException;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
 import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.model.exceptions.UserNotMatchingException;
+import com.example.bookme.model.projections.PropertyEditProjection;
 import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.repository.PropertyRepository;
+import com.example.bookme.repository.RecentlyViewedRepository;
 import com.example.bookme.repository.ReservationRepository;
 import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.PropertyService;
@@ -20,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -29,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,6 +44,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
+    private final RecentlyViewedRepository recentlyViewedRepository;
 
     @Override
     public Page<PropertyProjection> findAllWithPagination(Pageable pageable) {
@@ -220,33 +223,34 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public Optional<Property> save(PropertyDto propertyDto) throws IOException {
-        User propertyUser = userRepository.findByEmail(propertyDto.getPropertyUser())
+    public Optional<Property> save(PropertySaveDto propertySaveDto, Authentication authentication) throws IOException {
+        User propertyUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
 
         StringBuilder propertyImages = new StringBuilder();
 
-        for(MultipartFile image : propertyDto.getImages()){
+        for(MultipartFile image : propertySaveDto.getImages()){
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             propertyImages.append(fileName).append(";");
         }
 
         Property property = new Property(
-                propertyDto.getPropertyName(),
-                propertyDto.getPropertyDescription(),
-                propertyDto.getPropertyCity(),
-                propertyDto.getPropertyLocation(),
-                propertyDto.getPropertyAddress(),
-                propertyDto.getPropertyType(),
-                propertyDto.getPropertySize(),
-                propertyDto.getPropertyPrice(),
-                propertyDto.getPropertyImage(),
+                propertySaveDto.getPropertyName(),
+                propertySaveDto.getPropertyDescription(),
+                propertySaveDto.getPropertyCity(),
+                propertySaveDto.getPropertyLocation(),
+                propertySaveDto.getPropertyAddress(),
+                propertySaveDto.getPropertyType(),
+                propertySaveDto.getPropertySize(),
+                propertySaveDto.getPropertyPrice(),
+                propertySaveDto.getPropertyImage(),
                 propertyImages.toString(),
-                propertyUser);
+                propertyUser,
+                propertySaveDto.getPropertyAmenities());
 
         Property savedProperty = propertyRepository.save(property);
 
-        for(MultipartFile image : propertyDto.getImages()){
+        for(MultipartFile image : propertySaveDto.getImages()){
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
             String uploadDir = FileSaveConstants.uploadDir + "/"+ savedProperty.getId();
             FileUploadUtil.saveFile(uploadDir, fileName, image);
@@ -275,15 +279,33 @@ public class PropertyServiceImpl implements PropertyService {
             propertyToEdit.setPropertyName(propertyDto.getPropertyName());
             propertyToEdit.setPropertyDescription(propertyDto.getPropertyDescription());
             propertyToEdit.setPropertyCity(propertyDto.getPropertyCity());
+            propertyToEdit.setPropertyAddress(propertyDto.getPropertyAddress());
             propertyToEdit.setPropertyLocation(propertyDto.getPropertyLocation());
             propertyToEdit.setPropertyType(PropertyType.valueOf(propertyDto.getPropertyType()));
             propertyToEdit.setPropertySize(propertyDto.getPropertySize());
             propertyToEdit.setPropertyPrice(propertyDto.getPropertyPrice());
+            propertyToEdit.setPropertyAmenities(propertyDto.getPropertyAmenities());
 
             return Optional.of(propertyRepository.save(propertyToEdit));
         }
 
         throw new UserNotMatchingException();
+    }
+
+    @Override
+    public Optional<PropertyEditProjection> getEditDetails(Long id,
+                                                           Authentication authentication) {
+        PropertyEditProjection propertyToEdit = propertyRepository.findPropertyByIdForEdit(id)
+                .orElseThrow(PropertyNotFoundException::new);
+
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(!Objects.equals(propertyToEdit.getProperty_user_id(), loggedInUser.getId())) {
+            throw new UserNotMatchingException();
+        }
+
+        return Optional.of(propertyToEdit);
     }
 
     @Override
@@ -298,6 +320,14 @@ public class PropertyServiceImpl implements PropertyService {
         if(propertyToDelete.getPropertyUser() != loggedInUser){
             throw new UserNotMatchingException();
         }
+
+        userRepository.findAll()
+                        .forEach(user -> {
+                            List<Property> favourites = user.getFavouriteList();
+                            favourites.removeIf(i -> Objects.equals(i.getId(), propertyToDelete.getId()));
+                            user.setFavouriteList(favourites);
+                            userRepository.save(user);
+                        });
 
         propertyRepository.delete(propertyToDelete);
         return Optional.of(propertyToDelete);

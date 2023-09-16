@@ -22,7 +22,7 @@ public class Rating {
     private Long id;
     @ManyToOne
     private User ratedBy;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnore
     private Property propertyRated;
     private Double userRating;

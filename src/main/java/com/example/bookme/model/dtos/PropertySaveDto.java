@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PropertyDto {
+public class PropertySaveDto {
     private String propertyName;
     private String propertyDescription;
     private String propertyCity;
@@ -19,6 +19,6 @@ public class PropertyDto {
     private Double propertyPrice;
     private String propertyImage;
     private String propertyImages;
-    private String propertyUser;
+    private String propertyAmenities;
     private MultipartFile [] images;
 }
