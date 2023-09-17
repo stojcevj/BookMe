@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface RecentlyViewedService {
     Page<RecentlyViewed> findAll(Authentication authentication, Pageable pageable);
     Optional<RecentlyViewed> save(Authentication authentication, Long propertyId);
-    boolean removeAll(Authentication authentication);
-    boolean deleteById(Authentication authentication, Long id);
+    Optional<Boolean> removeAll(Authentication authentication);
+    Optional<Boolean> deleteById(Authentication authentication, Long id);
 }

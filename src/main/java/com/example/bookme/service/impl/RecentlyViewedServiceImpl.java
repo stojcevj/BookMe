@@ -75,16 +75,16 @@ public class RecentlyViewedServiceImpl implements RecentlyViewedService {
     }
 
     @Override
-    public boolean removeAll(Authentication authentication) {
-      //  User user = userRepository.findByEmail(authentication.getName())
-      //          .orElseThrow(UserNotFoundException::new);
-      //  recentlyViewedRepository.deleteAll(recentlyViewedRepository.findByUser(user));
-        return true;
+    public Optional<Boolean> removeAll(Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+        recentlyViewedRepository.deleteAll(recentlyViewedRepository.findByUser(user));
+        return Optional.of(true);
     }
 
     @Override
-    public boolean deleteById(Authentication authentication, Long id) {
+    public Optional<Boolean> deleteById(Authentication authentication, Long id) {
         recentlyViewedRepository.deleteById(id);
-        return true;
+        return Optional.of(true);
     }
 }
