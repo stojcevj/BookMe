@@ -1,6 +1,7 @@
 package com.example.bookme.service;
 
 import com.example.bookme.model.Property;
+import com.example.bookme.model.dtos.PropertyDto;
 import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
 import com.example.bookme.model.projections.PropertyEditProjection;
@@ -22,7 +23,7 @@ public interface PropertyService {
     Page<PropertyProjection> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate, LocalDateTime endDate, String search, Pageable pageable);
     Page<PropertyProjection> findAllForUser(Authentication authentication, Pageable pageable);
     Page<Property> findAllFavouritesForUser(Authentication authentication, Pageable pageable);
-    Optional<Property> findById(Long id);
+    Optional<PropertyDto> findById(Long id);
     Optional<Property> save(PropertySaveDto propertySaveDto, Authentication authentication) throws IOException;
     Optional<Property> edit(Authentication authentication, Long id, PropertyEditDto propertyDto) throws JsonProcessingException;
     Optional<PropertyEditProjection> getEditDetails(Long id, Authentication authentication);

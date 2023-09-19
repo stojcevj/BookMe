@@ -36,3 +36,5 @@ public class Rating {
         this.ratingTime = LocalDateTime.now();
     }
 }
+
+//TODO Make user comment TEXT in database and make something like comment Header od headline

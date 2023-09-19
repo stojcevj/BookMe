@@ -42,7 +42,6 @@ public class Property implements Serializable {
     private String propertyAmenities;
     @Transient
     private boolean bookmarked;
-
     public Property(String propertyName, String propertyDescription, String propertyCity,
                     String propertyLocation, String propertyAddress, String propertyType, Integer propertySize,
                     Double propertyPrice, String propertyImage, String propertyImages, User propertyUser, String propertyAmenities) {

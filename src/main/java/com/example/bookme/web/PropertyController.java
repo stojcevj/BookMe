@@ -3,6 +3,7 @@ package com.example.bookme.web;
 
 import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Property;
+import com.example.bookme.model.dtos.PropertyDto;
 import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
 import com.example.bookme.model.projections.PropertyProjection;
@@ -38,7 +39,7 @@ public class PropertyController {
         }
     }
     @GetMapping("{id}")
-    public ResponseEntity<Property> getPropertyById(@PathVariable Long id){
+    public ResponseEntity<PropertyDto> getPropertyById(@PathVariable Long id){
         return propertyService.findById(id)
                 .map(property -> ResponseEntity.ok().body(property))
                 .orElse(ResponseEntity.status(404).build());

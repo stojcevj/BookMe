@@ -1,5 +1,6 @@
 package com.example.bookme.model.dtos;
 
+import com.example.bookme.model.Property;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

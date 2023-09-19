@@ -5,6 +5,7 @@ import com.example.bookme.model.Property;
 import com.example.bookme.model.RecentlyViewed;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.User;
+import com.example.bookme.model.dtos.PropertyDto;
 import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
 import com.example.bookme.model.enumerations.PropertyType;
@@ -21,6 +22,7 @@ import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.PropertyService;
 import com.example.bookme.utils.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -217,9 +219,11 @@ public class PropertyServiceImpl implements PropertyService {
         return new PageImpl<>(loggedInUser.getFavouriteList(), pageable, loggedInUser.getFavouriteList().size());
     }
     @Override
-    public Optional<Property> findById(Long id) {
-        return Optional.ofNullable(propertyRepository.findById(id)
-                .orElseThrow(PropertyNotFoundException::new));
+    public Optional<PropertyDto> findById(Long id) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(PropertyNotFoundException::new);
+        PropertyDto propertyDto = PropertyDto.of(property);
+        return Optional.of(propertyDto);
     }
 
     @Override
