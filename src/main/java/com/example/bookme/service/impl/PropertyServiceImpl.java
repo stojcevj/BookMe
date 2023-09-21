@@ -1,10 +1,7 @@
 package com.example.bookme.service.impl;
 
 import com.example.bookme.config.FileSaveConstants;
-import com.example.bookme.model.Property;
-import com.example.bookme.model.RecentlyViewed;
-import com.example.bookme.model.Reservation;
-import com.example.bookme.model.User;
+import com.example.bookme.model.*;
 import com.example.bookme.model.dtos.PropertyDto;
 import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
@@ -15,14 +12,10 @@ import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.model.exceptions.UserNotMatchingException;
 import com.example.bookme.model.projections.PropertyEditProjection;
 import com.example.bookme.model.projections.PropertyProjection;
-import com.example.bookme.repository.PropertyRepository;
-import com.example.bookme.repository.RecentlyViewedRepository;
-import com.example.bookme.repository.ReservationRepository;
-import com.example.bookme.repository.UserRepository;
+import com.example.bookme.repository.*;
 import com.example.bookme.service.PropertyService;
 import com.example.bookme.utils.FileUploadUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -46,7 +40,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
-    private final RecentlyViewedRepository recentlyViewedRepository;
+    private final RatingRepository ratingRepository;
 
     @Override
     public Page<PropertyProjection> findAllWithPagination(Pageable pageable) {
@@ -71,86 +65,109 @@ public class PropertyServiceImpl implements PropertyService {
                                           Authentication authentication) {
         Page<PropertyProjection> properties;
 
-        if(search != null && startDate != null && endDate != null){
+        if (search != null && startDate != null && endDate != null) {
             properties = findAllWithFreeReservationDatesAndCitySearch(startDate, endDate, search, pageable);
-        }
-        else if(startDate != null && endDate != null){
+        } else if (startDate != null && endDate != null) {
             properties = findAllWithFreeReservationDates(startDate, endDate, pageable);
-        }
-        else if(search != null){
+        } else if (search != null) {
             properties = findAllWithCitySearch(search, pageable);
-        }
-        else{
+        } else {
             properties = findAllWithPagination(pageable);
         }
 
-        if(authentication != null){
-            return new PageImpl<>(properties.stream()
-                    .map(property -> new PropertyProjection() {
-                        @Override
-                        public Long getId() {
-                            return property.getId();
+        AtomicReference<Integer> numberOfRatings = new AtomicReference<>(0);
+        return new PageImpl<>(properties.stream()
+                .map(property -> new PropertyProjection() {
+                    @Override
+                    public Long getId() {
+                        return property.getId();
+                    }
+
+                    @Override
+                    public String getProperty_name() {
+                        return property.getProperty_name();
+                    }
+
+                    @Override
+                    public String getProperty_description() {
+                        return property.getProperty_description();
+                    }
+
+                    @Override
+                    public String getProperty_city() {
+                        return property.getProperty_city();
+                    }
+
+                    @Override
+                    public String getProperty_address() {
+                        return property.getProperty_address();
+                    }
+
+                    @Override
+                    public String getProperty_location() {
+                        return property.getProperty_location();
+                    }
+
+                    @Override
+                    public String getProperty_type() {
+                        return property.getProperty_type();
+                    }
+
+                    @Override
+                    public Integer getProperty_size() {
+                        return property.getProperty_size();
+                    }
+
+                    @Override
+                    public Double getProperty_price() {
+                        return property.getProperty_price();
+                    }
+
+                    @Override
+                    public String getProperty_image() {
+                        return property.getProperty_image();
+                    }
+
+                    @Override
+                    public String getProperty_images() {
+                        return property.getProperty_images();
+                    }
+
+                    @Override
+                    public Boolean getBookmarked() {
+                        if(authentication == null){
+                            return Boolean.FALSE;
+                        }
+                        return propertyIsBookmarkedByUser(authentication, property.getId());
+                    }
+
+                    @Override
+                    public Double getAverageRating() {
+                        AtomicReference<Double> avgRating = new AtomicReference<>(0D);
+
+                        ratingRepository.findAllByPropertyRated(property.getId())
+                                .stream()
+                                .mapToDouble(Rating::getUserRating)
+                                .forEach(i -> {
+                                    numberOfRatings.getAndSet(numberOfRatings.get() + 1);
+                                    avgRating.updateAndGet(v -> v + i);
+                                });
+
+                        if (avgRating.get() == 0.0 || numberOfRatings.get() == 0) {
+                            return 0D;
                         }
 
-                        @Override
-                        public String getProperty_name() {
-                            return property.getProperty_name();
-                        }
+                        return avgRating.get() / numberOfRatings.get();
+                    }
 
-                        @Override
-                        public String getProperty_description() {
-                            return property.getProperty_description();
-                        }
-
-                        @Override
-                        public String getProperty_city() {
-                            return property.getProperty_city();
-                        }
-
-                        @Override
-                        public String getProperty_address() {
-                            return property.getProperty_address();
-                        }
-
-                        @Override
-                        public String getProperty_location() {
-                            return property.getProperty_location();
-                        }
-
-                        @Override
-                        public String getProperty_type() {
-                            return property.getProperty_type();
-                        }
-
-                        @Override
-                        public Integer getProperty_size() {
-                            return property.getProperty_size();
-                        }
-
-                        @Override
-                        public Double getProperty_price() {
-                            return property.getProperty_price();
-                        }
-
-                        @Override
-                        public String getProperty_image() {
-                            return property.getProperty_image();
-                        }
-
-                        @Override
-                        public String getProperty_images() {
-                            return property.getProperty_images();
-                        }
-
-                        @Override
-                        public Boolean getBookmarked() {
-                            return propertyIsBookmarkedByUser(authentication, property.getId());
-                        }
-                    })
-                    .collect(Collectors.toList()), pageable, properties.getTotalElements());
-        }
-
-        return properties;
+                    @Override
+                    public Integer getNumberOfRatings() {
+                        Integer numOfRatings = numberOfRatings.get();
+                        numberOfRatings.set(0);
+                        return numOfRatings;
+                    }
+                })
+                .collect(Collectors.toList()), pageable, properties.getTotalElements());
     }
 
     @Override

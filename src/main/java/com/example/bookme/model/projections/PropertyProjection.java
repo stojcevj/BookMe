@@ -3,6 +3,8 @@ package com.example.bookme.model.projections;
 import com.example.bookme.repository.PropertyRepository;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import org.springframework.data.relational.core.sql.In;
+
 public interface PropertyProjection {
     Long getId();
     @JsonProperty("propertyName")
@@ -27,4 +29,8 @@ public interface PropertyProjection {
     String getProperty_images();
     @JsonProperty("bookmarked")
     Boolean getBookmarked();
+    @JsonProperty("propertyAverageRating")
+    Double getAverageRating();
+    @JsonProperty("propertyNumberOfRatings")
+    Integer getNumberOfRatings();
 }
