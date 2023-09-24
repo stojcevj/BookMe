@@ -52,6 +52,7 @@ public class PropertyController {
                                            @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         return propertyService.findAll(pageable, searchString, startDate, endDate, authentication);
     }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> save(Authentication authentication,
