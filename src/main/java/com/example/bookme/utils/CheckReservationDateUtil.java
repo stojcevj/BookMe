@@ -8,6 +8,14 @@ public class CheckReservationDateUtil {
                                                 Reservation reservation){
         return (
                     (
+                            reservationAddDto.getReservationStartDate().isBefore(reservationAddDto.getReservationEndDate())
+                         &&
+                            !reservation.getReservationStartDate().isEqual(reservationAddDto.getReservationStartDate())
+                         &&
+                            !reservation.getReservationEndDate().isEqual(reservationAddDto.getReservationEndDate())
+                    )
+                    &&
+                    (
                             reservationAddDto.getReservationStartDate().isAfter(reservation.getReservationStartDate())
                         &&
                             (
