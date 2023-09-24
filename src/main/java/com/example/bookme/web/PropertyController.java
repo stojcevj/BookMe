@@ -44,13 +44,21 @@ public class PropertyController {
                 .map(property -> ResponseEntity.ok().body(property))
                 .orElse(ResponseEntity.status(404).build());
     }
-    @GetMapping
+    @GetMapping()
     public Page<PropertyProjection> getAll(Authentication authentication,
-                                           @RequestParam(required = false, name = "s") String searchString,
+                                           @RequestParam(required = false, name = "search") String searchString,
                                            @RequestParam(required = false,name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                            @RequestParam(required = false,name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                           @RequestParam(required = false,name = "propertyTypes") String propertyTypes,
+                                           @RequestParam(required = false,name = "propertyAmenities") String propertyAmenities,
+                                           @RequestParam(required = false,name = "propertyRating")  String propertyRating,
+                                           @RequestParam(required = false,name = "priceRange")  String priceRange,
                                            @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
-        return propertyService.findAll(pageable, searchString, startDate, endDate, authentication);
+        try{
+            return propertyService.findAll(searchString, startDate, endDate, propertyTypes, propertyAmenities, propertyRating, priceRange, pageable, authentication);
+        }catch (Exception e){
+            return Page.empty();
+        }
     }
     @PostMapping
     @PreAuthorize("isAuthenticated()")

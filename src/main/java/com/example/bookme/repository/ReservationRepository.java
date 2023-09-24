@@ -16,14 +16,5 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Page<Reservation> findAllByReservationUser(User user, Pageable pageable);
     List<Reservation> findAllByReservationProperty(Property property);
-    List<Reservation> findAllByReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(LocalDateTime startDate,
-                                                                                                                                                          LocalDateTime endDate,
-                                                                                                                                                          LocalDateTime startDate1,
-                                                                                                                                                          LocalDateTime endDate1);
-    List<Reservation> findAllByReservationProperty_PropertyCityLikeIgnoreCaseAndReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(String city,
-                                                                                                                                                                                                           LocalDateTime startDate,
-                                                                                                                                                                                                           LocalDateTime endDate,
-                                                                                                                                                                                                           LocalDateTime startDate1,
-                                                                                                                                                                                                           LocalDateTime endDate1);
     Optional<Reservation> findAllByReservationUserAndReservationPropertyAndReservationStartDateAndReservationEndDateIsBefore(User reservationUser, Property reservationProperty, LocalDateTime reservationStartDate, LocalDateTime afterDate);
 }

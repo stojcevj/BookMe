@@ -43,37 +43,53 @@ public class PropertyServiceImpl implements PropertyService {
     private final RatingRepository ratingRepository;
 
     @Override
-    public Page<PropertyProjection> findAllWithPagination(Pageable pageable) {
-        return propertyRepository.findAllWithProjection(pageable);
-    }
+    public Page<PropertyProjection> findAll(String searchString,
+                                            LocalDateTime startDate,
+                                            LocalDateTime endDate,
+                                            String propertyTypes,
+                                            String propertyAmenities,
+                                            String propertyRating,
+                                            String priceRange,
+                                            Pageable pageable,
+                                            Authentication authentication) {
+        int propertyAmenitiesCount = 0;
+        int [] priceRangeArr = new int[2];
 
-    @Override
-    public Page<PropertyProjection> findAllWithCitySearch(String search,
-                                                Pageable pageable) {
-        if (search.isEmpty()){
-            return propertyRepository.findAllWithProjection(pageable);
+        if(startDate == null && endDate == null){
+            startDate = LocalDateTime.now().plusYears(10);
+            endDate = LocalDateTime.now().plusYears(10).plusDays(1);
         }
 
-        return propertyRepository.findAllByPropertyCityContainingIgnoreCase(search, pageable);
-    }
-
-    @Override
-    public Page<PropertyProjection> findAll(Pageable pageable,
-                                          String search,
-                                          LocalDateTime startDate,
-                                          LocalDateTime endDate,
-                                          Authentication authentication) {
-        Page<PropertyProjection> properties;
-
-        if (search != null && startDate != null && endDate != null) {
-            properties = findAllWithFreeReservationDatesAndCitySearch(startDate, endDate, search, pageable);
-        } else if (startDate != null && endDate != null) {
-            properties = findAllWithFreeReservationDates(startDate, endDate, pageable);
-        } else if (search != null) {
-            properties = findAllWithCitySearch(search, pageable);
-        } else {
-            properties = findAllWithPagination(pageable);
+        if(propertyAmenities != null){
+            propertyAmenities = propertyAmenities.replace(';', '-');
+            propertyAmenitiesCount = propertyAmenities.split("-").length;
         }
+
+        if(propertyRating != null){
+            propertyRating = propertyRating.replace(';','-');
+        }
+
+        if(propertyTypes != null){
+            propertyTypes = propertyTypes.replace(';','-');
+        }
+
+        if(priceRange != null){
+            priceRangeArr[0] = Integer.parseInt(priceRange.split(";")[0]);
+            priceRangeArr[1] = Integer.parseInt(priceRange.split(";")[1]);
+        }else{
+            priceRangeArr[1] = 999999;
+        }
+
+        Page<PropertyProjection> properties = propertyRepository.findAllPropertiesByFilter(pageable,
+                propertyAmenities,
+                propertyAmenitiesCount,
+                propertyTypes,
+                propertyRating,
+                searchString,
+                priceRangeArr[0],
+                priceRangeArr[1],
+                startDate,
+                endDate);
 
         AtomicReference<Integer> numberOfRatings = new AtomicReference<>(0);
         return new PageImpl<>(properties.stream()
@@ -180,41 +196,6 @@ public class PropertyServiceImpl implements PropertyService {
                 .orElseThrow(PropertyNotFoundException::new);
 
         return loggedInUser.getFavouriteList().contains(property);
-    }
-
-    @Override
-    public Page<PropertyProjection> findAllWithFreeReservationDates(LocalDateTime startDate,
-                                                          LocalDateTime endDate,
-                                                          Pageable pageable) {
-        List<Long> usedProperties = reservationRepository
-                .findAllByReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(startDate,endDate,startDate,endDate)
-                .stream()
-                .map(s -> s.getReservationProperty().getId())
-                .toList();
-
-        if(usedProperties.isEmpty()){
-            return propertyRepository.findAllWithProjection(pageable);
-        }
-
-        return propertyRepository.findAllByIdNotIn(usedProperties, pageable);
-    }
-
-    @Override
-    public Page<PropertyProjection> findAllWithFreeReservationDatesAndCitySearch(LocalDateTime startDate,
-                                                                       LocalDateTime endDate,
-                                                                       String search,
-                                                                       Pageable pageable) {
-        List<Long> usedProperties = reservationRepository
-                .findAllByReservationProperty_PropertyCityLikeIgnoreCaseAndReservationStartDateGreaterThanAndReservationStartDateLessThanOrReservationEndDateGreaterThanAndReservationEndDateLessThan(search,startDate,endDate,startDate,endDate)
-                .stream()
-                .map(s -> s.getReservationProperty().getId())
-                .toList();
-
-        if(usedProperties.isEmpty()){
-            return propertyRepository.findAllByPropertyCityContainingIgnoreCase(search, pageable);
-        }
-
-        return propertyRepository.findAllByIdNotIn(usedProperties, pageable);
     }
 
     @Override

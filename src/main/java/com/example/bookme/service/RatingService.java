@@ -7,5 +7,7 @@ import org.springframework.security.core.Authentication;
 import java.util.Optional;
 
 public interface RatingService {
-    Optional<Rating> addRatingToProperty(Long id, Authentication authentication, RatingDto ratingDto);
+    Optional<Rating> addRatingToProperty(Long id,
+                                         Authentication authentication,
+                                         RatingDto ratingDto);
 }
