@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/properties")
@@ -43,6 +44,10 @@ public class PropertyController {
         return propertyService.findById(id)
                 .map(property -> ResponseEntity.ok().body(property))
                 .orElse(ResponseEntity.status(404).build());
+    }
+    @GetMapping("/getAll")
+    public List<PropertyProjection> getAllPropertiesForMap(){
+        return propertyService.findAllForMap();
     }
     @GetMapping()
     public Page<PropertyProjection> getAll(Authentication authentication,

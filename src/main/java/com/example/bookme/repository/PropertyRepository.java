@@ -21,6 +21,8 @@ import java.util.Optional;
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Long> {
     Page<Property> findAll(Pageable pageable);
+    @Query(value = "SELECT p.id, p.property_name, p.property_description, p.property_city, p.property_address, p.property_location, p.property_type, p.property_size, p.property_price, p.property_image, p.property_images FROM property p", nativeQuery = true)
+    List<PropertyProjection> findAllForMap();
     @Query(value = "SELECT p.id, p.property_name, p.property_description, p.property_city, p.property_address, p.property_location, p.property_type, p.property_size, p.property_price, p.property_image, p.property_images FROM property p WHERE p.property_user_id = :userId", nativeQuery = true)
     Page<PropertyProjection> findAllByPropertyUser(@Param("userId") Long userId, Pageable pageable);
     @Query(value = "SELECT p.property_name, p.property_description, p.property_city, p.property_address, p.property_location, p.property_type, p.property_size, p.property_price, p.property_amenities, p.property_user_id FROM property p WHERE p.id = :propertyId", nativeQuery = true)
@@ -102,7 +104,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
             "      reservation res \n" +
             "    WHERE \n" +
             "      res.reservation_property_id = p.id \n" +
-            "      AND (\n" +
+            "      AND (SELECT NOW() < :propertyStartDate) AND (SELECT NOW() < :propertyEndDate) AND (\n" +
             "        (\n" +
             "          :propertyStartDate < :propertyEndDate \n" +
             "          AND :propertyStartDate > res.reservation_start_date \n" +
