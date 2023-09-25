@@ -15,6 +15,7 @@ import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.repository.*;
 import com.example.bookme.service.PropertyService;
 import com.example.bookme.utils.FileUploadUtil;
+import com.example.bookme.utils.ReCreatePropertyProjectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,104 +40,12 @@ import java.util.stream.Collectors;
 public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepository propertyRepository;
     private final UserRepository userRepository;
-    private final ReservationRepository reservationRepository;
     private final RatingRepository ratingRepository;
 
     @Override
     public List<PropertyProjection> findAllForMap() {
         AtomicReference<Integer> numberOfRatings = new AtomicReference<>(0);
-
-        List<PropertyProjection> properties = propertyRepository.findAllForMap()
-                .stream()
-                .map(property -> new PropertyProjection() {
-                    @Override
-                    public Long getId() {
-                        return property.getId();
-                    }
-
-                    @Override
-                    public String getProperty_name() {
-                        return property.getProperty_name();
-                    }
-
-                    @Override
-                    public String getProperty_description() {
-                        return property.getProperty_description();
-                    }
-
-                    @Override
-                    public String getProperty_city() {
-                        return property.getProperty_city();
-                    }
-
-                    @Override
-                    public String getProperty_address() {
-                        return property.getProperty_address();
-                    }
-
-                    @Override
-                    public String getProperty_location() {
-                        return property.getProperty_location();
-                    }
-
-                    @Override
-                    public String getProperty_type() {
-                        return property.getProperty_type();
-                    }
-
-                    @Override
-                    public Integer getProperty_size() {
-                        return property.getProperty_size();
-                    }
-
-                    @Override
-                    public Double getProperty_price() {
-                        return property.getProperty_price();
-                    }
-
-                    @Override
-                    public String getProperty_image() {
-                        return property.getProperty_image();
-                    }
-
-                    @Override
-                    public String getProperty_images() {
-                        return property.getProperty_images();
-                    }
-
-                    @Override
-                    public Boolean getBookmarked() {
-                        return false;
-                    }
-
-                    @Override
-                    public Double getAverageRating() {
-                        AtomicReference<Double> avgRating = new AtomicReference<>(0D);
-
-                        ratingRepository.findAllByPropertyRated(property.getId())
-                                .stream()
-                                .mapToDouble(Rating::getUserRating)
-                                .forEach(i -> {
-                                    numberOfRatings.getAndSet(numberOfRatings.get() + 1);
-                                    avgRating.updateAndGet(v -> v + i);
-                                });
-
-                        if (avgRating.get() == 0.0 || numberOfRatings.get() == 0) {
-                            return 0D;
-                        }
-
-                        return avgRating.get() / numberOfRatings.get();
-                    }
-
-                    @Override
-                    public Integer getNumberOfRatings() {
-                        Integer numOfRatings = numberOfRatings.get();
-                        numberOfRatings.set(0);
-                        return numOfRatings;
-                    }
-                })
-                .collect(Collectors.toList());
-        return properties;
+        return ReCreatePropertyProjectionUtil.reCreate(propertyRepository.findAllForMap(), ratingRepository);
     }
 
     @Override
@@ -188,99 +97,8 @@ public class PropertyServiceImpl implements PropertyService {
                 startDate,
                 endDate);
 
-        AtomicReference<Integer> numberOfRatings = new AtomicReference<>(0);
-        return new PageImpl<>(properties.stream()
-                .map(property -> new PropertyProjection() {
-                    @Override
-                    public Long getId() {
-                        return property.getId();
-                    }
-
-                    @Override
-                    public String getProperty_name() {
-                        return property.getProperty_name();
-                    }
-
-                    @Override
-                    public String getProperty_description() {
-                        return property.getProperty_description();
-                    }
-
-                    @Override
-                    public String getProperty_city() {
-                        return property.getProperty_city();
-                    }
-
-                    @Override
-                    public String getProperty_address() {
-                        return property.getProperty_address();
-                    }
-
-                    @Override
-                    public String getProperty_location() {
-                        return property.getProperty_location();
-                    }
-
-                    @Override
-                    public String getProperty_type() {
-                        return property.getProperty_type();
-                    }
-
-                    @Override
-                    public Integer getProperty_size() {
-                        return property.getProperty_size();
-                    }
-
-                    @Override
-                    public Double getProperty_price() {
-                        return property.getProperty_price();
-                    }
-
-                    @Override
-                    public String getProperty_image() {
-                        return property.getProperty_image();
-                    }
-
-                    @Override
-                    public String getProperty_images() {
-                        return property.getProperty_images();
-                    }
-
-                    @Override
-                    public Boolean getBookmarked() {
-                        if(authentication == null){
-                            return Boolean.FALSE;
-                        }
-                        return propertyIsBookmarkedByUser(authentication, property.getId());
-                    }
-
-                    @Override
-                    public Double getAverageRating() {
-                        AtomicReference<Double> avgRating = new AtomicReference<>(0D);
-
-                        ratingRepository.findAllByPropertyRated(property.getId())
-                                .stream()
-                                .mapToDouble(Rating::getUserRating)
-                                .forEach(i -> {
-                                    numberOfRatings.getAndSet(numberOfRatings.get() + 1);
-                                    avgRating.updateAndGet(v -> v + i);
-                                });
-
-                        if (avgRating.get() == 0.0 || numberOfRatings.get() == 0) {
-                            return 0D;
-                        }
-
-                        return avgRating.get() / numberOfRatings.get();
-                    }
-
-                    @Override
-                    public Integer getNumberOfRatings() {
-                        Integer numOfRatings = numberOfRatings.get();
-                        numberOfRatings.set(0);
-                        return numOfRatings;
-                    }
-                })
-                .collect(Collectors.toList()), pageable, properties.getTotalElements());
+        return new PageImpl<>(ReCreatePropertyProjectionUtil.reCreate(properties.toList(), ratingRepository),
+                pageable, properties.getTotalElements());
     }
 
     @Override

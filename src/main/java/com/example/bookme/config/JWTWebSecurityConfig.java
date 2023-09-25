@@ -5,6 +5,7 @@ import com.example.bookme.config.filters.JWTAuthenticationFilter;
 import com.example.bookme.config.filters.JWTAuthorizationFilter;
 import com.example.bookme.service.UserService;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.filters.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -39,7 +43,8 @@ public class JWTWebSecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/properties/**"),
                                 new AntPathRequestMatcher("/api/auth/**"),
                                 new AntPathRequestMatcher("/api/images/**"),
-                                new AntPathRequestMatcher("/api/recently-viewed/**"))
+                                new AntPathRequestMatcher("/api/recently-viewed/**"),
+                                new AntPathRequestMatcher("/api/reservation/**"))
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -72,7 +77,6 @@ public class JWTWebSecurityConfig {
     public AuthenticationEntryPoint customAuthEntryPoint(){
         return new CustomAuthEntryPoint();
     }
-
 
 //    @Bean
 //    public WebMvcConfigurer corsConfigurer() {
