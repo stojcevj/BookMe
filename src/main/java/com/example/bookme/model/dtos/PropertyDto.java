@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -59,13 +60,18 @@ public class PropertyDto {
                 .propertyPrice(property.getPropertyPrice())
                 .propertyImage(property.getPropertyImage())
                 .propertyUser(property.getPropertyUser())
-                .reservationList(property.getReservationList())
                 .propertyRating(property.getPropertyRating())
                 .propertyImages(property.getPropertyImages())
                 .propertyAmenities(property.getPropertyAmenities())
                 .bookmarked(property.isBookmarked())
                 .build();
         propertyDto.setAverageRating(propertyDto.getAverageRating());
+        List<Reservation> propertyReservations = property.getReservationList()
+                .stream()
+                .filter(s -> s.getReservationStartDate().isAfter(LocalDateTime.now())
+                        || s.getReservationEndDate().isAfter(LocalDateTime.now()))
+                .toList();
+        propertyDto.setReservationList(propertyReservations);
 
         return propertyDto;
     }

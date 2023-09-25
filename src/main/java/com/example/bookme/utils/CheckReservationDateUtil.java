@@ -3,10 +3,18 @@ package com.example.bookme.utils;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.dtos.ReservationAddDto;
 
+import java.time.LocalDateTime;
+
 public class CheckReservationDateUtil {
     public static boolean CheckReservationDates(ReservationAddDto reservationAddDto,
                                                 Reservation reservation){
         return (
+                    (
+                            reservationAddDto.getReservationStartDate().isAfter(LocalDateTime.now())
+                        &&
+                            reservationAddDto.getReservationEndDate().isAfter(LocalDateTime.now())
+                    )
+                    &&
                     (
                             reservationAddDto.getReservationStartDate().isBefore(reservationAddDto.getReservationEndDate())
                          &&
