@@ -55,6 +55,7 @@ public class PropertyController {
                                            @RequestParam(required = false,name = "priceRange")  String priceRange,
                                            @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         try{
+            System.out.println(priceRange);
             return propertyService.findAll(searchString, startDate, endDate, propertyTypes, propertyAmenities, propertyRating, priceRange, pageable, authentication);
         }catch (Exception e){
             return Page.empty();
