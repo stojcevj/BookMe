@@ -1,10 +1,11 @@
 package com.example.bookme.service.impl;
 
 import com.example.bookme.config.FileSaveConstants;
-import com.example.bookme.model.*;
+import com.example.bookme.model.Property;
+import com.example.bookme.model.User;
 import com.example.bookme.model.dtos.PropertyDto;
-import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.dtos.PropertyEditDto;
+import com.example.bookme.model.dtos.PropertySaveDto;
 import com.example.bookme.model.enumerations.PropertyType;
 import com.example.bookme.model.exceptions.AnonymousUserException;
 import com.example.bookme.model.exceptions.PropertyNotFoundException;
@@ -12,7 +13,9 @@ import com.example.bookme.model.exceptions.UserNotFoundException;
 import com.example.bookme.model.exceptions.UserNotMatchingException;
 import com.example.bookme.model.projections.PropertyEditProjection;
 import com.example.bookme.model.projections.PropertyProjection;
-import com.example.bookme.repository.*;
+import com.example.bookme.repository.PropertyRepository;
+import com.example.bookme.repository.RatingRepository;
+import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.PropertyService;
 import com.example.bookme.utils.FileUploadUtil;
 import com.example.bookme.utils.ReCreatePropertyProjectionUtil;
@@ -31,8 +34,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -44,10 +45,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public List<PropertyProjection> findAllForMap() {
-        AtomicReference<Integer> numberOfRatings = new AtomicReference<>(0);
         return ReCreatePropertyProjectionUtil.reCreate(propertyRepository.findAllForMap(), ratingRepository);
     }
-
     @Override
     public Page<PropertyProjection> findAll(String searchString,
                                             LocalDateTime startDate,
@@ -100,7 +99,6 @@ public class PropertyServiceImpl implements PropertyService {
         return new PageImpl<>(ReCreatePropertyProjectionUtil.reCreate(properties.toList(), ratingRepository),
                 pageable, properties.getTotalElements());
     }
-
     @Override
     public boolean propertyIsBookmarkedByUser(Authentication authentication,
                                               Long id){
@@ -112,7 +110,6 @@ public class PropertyServiceImpl implements PropertyService {
 
         return loggedInUser.getFavouriteList().contains(property);
     }
-
     @Override
     public Page<PropertyProjection> findAllForUser(Authentication authentication,
                                          Pageable pageable) {
@@ -121,7 +118,6 @@ public class PropertyServiceImpl implements PropertyService {
 
         return propertyRepository.findAllByPropertyUser(loggedInUser.getId(), pageable);
     }
-
     @Override
     public Page<Property> findAllFavouritesForUser(Authentication authentication, Pageable pageable) {
         User loggedInUser = userRepository.findByEmail(authentication.getName())
@@ -135,6 +131,7 @@ public class PropertyServiceImpl implements PropertyService {
     public Optional<PropertyDto> findById(Long id) {
         Property property = propertyRepository.findById(id)
                 .orElseThrow(PropertyNotFoundException::new);
+
         PropertyDto propertyDto = PropertyDto.of(property);
         return Optional.of(propertyDto);
     }
