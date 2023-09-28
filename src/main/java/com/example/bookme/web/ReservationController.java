@@ -3,9 +3,13 @@ package com.example.bookme.web;
 import com.example.bookme.config.PageableConstants;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.dtos.ReservationAddDto;
+import com.example.bookme.model.dtos.ReservationDto;
+import com.example.bookme.model.projections.PropertyProjection;
 import com.example.bookme.service.ReservationService;
+import com.example.bookme.utils.ReCreatePropertyProjectionUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +37,7 @@ public class ReservationController {
         }
     }
     @DeleteMapping ("/{id}/delete")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteReservation(@PathVariable Long id,
                                                Authentication authentication){
         try{
@@ -44,10 +49,14 @@ public class ReservationController {
         }
     }
     @GetMapping
-    public Page<Reservation> getAllReservations(Authentication authentication,
+    @PreAuthorize("isAuthenticated()")
+    public Page<ReservationDto> getAllReservations(Authentication authentication,
                                                 @PageableDefault(size = PageableConstants.PAGE_SIZE, page = PageableConstants.DEFAULT_PAGE) Pageable pageable){
         try{
-            return reservationService.getAllReservationsForUser(authentication, pageable);
+            Page<Reservation> reservations = reservationService.getAllReservationsForUser(authentication, pageable);
+            return new PageImpl<>(reservations.stream()
+                    .map(ReservationDto::of)
+                    .toList(), pageable, reservations.getTotalElements());
         }catch (Exception e){
             return Page.empty(pageable);
         }

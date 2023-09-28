@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/rating")
 @AllArgsConstructor
+@CrossOrigin("*")
 public class RatingController {
     private final RatingService ratingService;
     @PostMapping("/{id}")

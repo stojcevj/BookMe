@@ -21,7 +21,7 @@ public class Reservation {
     private Long id;
     @ManyToOne
     private User reservationUser;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JsonIgnore
     private Property reservationProperty;
     private LocalDateTime reservationStartDate;
