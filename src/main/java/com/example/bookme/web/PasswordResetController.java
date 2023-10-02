@@ -2,6 +2,7 @@ package com.example.bookme.web;
 
 import com.example.bookme.model.PasswordResetToken;
 import com.example.bookme.model.User;
+import com.example.bookme.model.dtos.PasswordResetRequestDto;
 import com.example.bookme.service.EmailService;
 import com.example.bookme.service.PasswordResetTokenService;
 import com.example.bookme.service.UserService;
@@ -22,8 +23,8 @@ public class PasswordResetController {
     private UserService userService;
     private EmailService emailService;
 
-    @PostMapping
-    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+    @PostMapping("/email-verification")
+    public ResponseEntity<?> resetPasswordEmailVerification(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         User user = userService.findByEmail(email).orElse(null);
 
@@ -41,7 +42,10 @@ public class PasswordResetController {
         }
     }
 
-
-
-
+    @PostMapping
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequestDto passwordResetRequestDto){
+        return userService.resetPassword(passwordResetRequestDto)
+                .map(i -> ResponseEntity.ok().build())
+                .orElse(ResponseEntity.badRequest().build());
+    }
 }

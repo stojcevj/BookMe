@@ -1,10 +1,13 @@
 package com.example.bookme.service.impl;
 
+import com.example.bookme.model.PasswordResetToken;
 import com.example.bookme.model.User;
 import com.example.bookme.model.dtos.ChangePasswordDto;
+import com.example.bookme.model.dtos.PasswordResetRequestDto;
 import com.example.bookme.model.dtos.SignUpDto;
 import com.example.bookme.model.enumerations.Role;
 import com.example.bookme.model.exceptions.*;
+import com.example.bookme.repository.PasswordResetTokenRepository;
 import com.example.bookme.repository.UserRepository;
 import com.example.bookme.service.UserService;
 import com.example.bookme.utils.TokenParseUtil;
@@ -24,6 +27,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository tokenRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
@@ -73,9 +77,17 @@ public class UserServiceImpl implements UserService {
             throw new PasswordDoNotMatchException();
         }
 
-        authenticatedUser.setPassword(changePasswordDto.getUserNewPassword());
+        authenticatedUser.setPassword(passwordEncoder.encode(changePasswordDto.getUserNewPassword()));
 
         return Optional.of(userRepository.save(authenticatedUser));
+    }
+
+    @Override
+    public Optional<User> resetPassword(PasswordResetRequestDto request) {
+        PasswordResetToken token = this.tokenRepository.findByToken(request.getToken()).orElseThrow(TokenNotFoundException::new);
+        User user = token.getUser();
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        return Optional.of(userRepository.save(user));
     }
 
     @Override

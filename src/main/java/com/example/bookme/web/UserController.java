@@ -3,6 +3,7 @@ package com.example.bookme.web;
 import com.example.bookme.config.filters.JWTAuthenticationFilter;
 import com.example.bookme.model.dtos.ChangePasswordDto;
 import com.example.bookme.model.dtos.SignUpDto;
+import com.example.bookme.model.dtos.UserDetailsDto;
 import com.example.bookme.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;

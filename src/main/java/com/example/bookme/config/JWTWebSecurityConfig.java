@@ -46,7 +46,7 @@ public class JWTWebSecurityConfig {
                                 new AntPathRequestMatcher("/api/recently-viewed/**"),
                                 new AntPathRequestMatcher("/api/help/**"),
                                 new AntPathRequestMatcher("/api/rating/**"),
-                                new AntPathRequestMatcher("/api/reset-password"),
+                                new AntPathRequestMatcher("/api/reset-password/**"),
                                 new AntPathRequestMatcher("/api/reservation/**"))
                         .permitAll()
                         .anyRequest()
