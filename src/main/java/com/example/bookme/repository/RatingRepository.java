@@ -9,9 +9,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
     @Query(value = "SELECT * FROM rating r WHERE r.property_rated_id = :propertyId", nativeQuery = true)
     List<Rating> findAllByPropertyRated(@Param("propertyId") Long propertyId);
+    Optional<Rating> findByPropertyRatedAndRatedBy(Property property, User user);
 }

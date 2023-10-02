@@ -45,6 +45,12 @@ public class PropertyController {
                 .map(property -> ResponseEntity.ok().body(property))
                 .orElse(ResponseEntity.status(404).build());
     }
+    @GetMapping("{id}/small")
+    public ResponseEntity<PropertyProjection> getPropertyByIdSmall(@PathVariable Long id){
+        return propertyService.findByIdSmall(id)
+                .map(property -> ResponseEntity.ok().body(property))
+                .orElse(ResponseEntity.status(404).build());
+    }
     @GetMapping("/getAll")
     public List<PropertyProjection> getAllPropertiesForMap(){
         return propertyService.findAllForMap();

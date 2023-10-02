@@ -1,11 +1,6 @@
 package com.example.bookme.model.dtos;
 
-import com.example.bookme.model.Property;
 import com.example.bookme.model.Reservation;
-import com.example.bookme.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 

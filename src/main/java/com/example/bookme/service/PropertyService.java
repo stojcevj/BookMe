@@ -32,6 +32,7 @@ public interface PropertyService {
     Page<Property> findAllFavouritesForUser(Authentication authentication,
                                             Pageable pageable);
     Optional<PropertyDto> findById(Long id);
+    Optional<PropertyProjection> findByIdSmall(Long id);
     Optional<Property> save(PropertySaveDto propertySaveDto,
                             Authentication authentication) throws IOException;
     Optional<Property> edit(Authentication authentication,

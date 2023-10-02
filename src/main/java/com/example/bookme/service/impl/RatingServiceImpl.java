@@ -5,9 +5,7 @@ import com.example.bookme.model.Rating;
 import com.example.bookme.model.Reservation;
 import com.example.bookme.model.User;
 import com.example.bookme.model.dtos.RatingDto;
-import com.example.bookme.model.exceptions.PropertyNotFoundException;
-import com.example.bookme.model.exceptions.ReservationNotFoundException;
-import com.example.bookme.model.exceptions.UserNotFoundException;
+import com.example.bookme.model.exceptions.*;
 import com.example.bookme.repository.PropertyRepository;
 import com.example.bookme.repository.RatingRepository;
 import com.example.bookme.repository.ReservationRepository;
@@ -42,6 +40,17 @@ public class RatingServiceImpl implements RatingService {
                 .orElseThrow(ReservationNotFoundException::new);
 
         if(reservation != null){
+            Rating checkRating = ratingRepository.findByPropertyRatedAndRatedBy(propertyToBeRated, loggedInUser)
+                    .orElse(null);
+
+            if(checkRating != null){
+                checkRating.setUserRating(ratingDto.getUserRating());
+                checkRating.setUserComment(ratingDto.getUserComment());
+                checkRating.setRatingTime(LocalDateTime.now());
+                return Optional.of(ratingRepository.save(checkRating));
+
+            }
+
             Rating rating = new Rating(
                     loggedInUser,
                     propertyToBeRated,
@@ -54,5 +63,27 @@ public class RatingServiceImpl implements RatingService {
             return Optional.of(rating);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<Rating> findRatingByPropertyAndUser(Authentication authentication,
+                                                        Long reservationId) {
+        User loggedInUser = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(UserNotFoundException::new);
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
+
+        User reservationUser = userRepository.findByEmail(reservation.getReservationUser().getEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(reservationUser != loggedInUser){
+            throw new UserNotMatchingException();
+        }
+
+        Property reservationProperty = propertyRepository.findById(reservation.getReservationProperty().getId())
+                .orElseThrow(PropertyNotFoundException::new);
+
+        return ratingRepository.findByPropertyRatedAndRatedBy(reservationProperty, reservationUser);
     }
 }

@@ -31,7 +31,7 @@ public class ReservationServiceImpl implements ReservationService {
         User loggedInUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
 
-        return reservationRepository.findAllByReservationUser(loggedInUser, pageable);
+        return reservationRepository.findAllByReservationUserOrderByReservationEndDateDesc(loggedInUser, Pageable.unpaged());
     }
 
     @Override

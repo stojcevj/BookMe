@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    Page<Reservation> findAllByReservationUser(User user, Pageable pageable);
+    Page<Reservation> findAllByReservationUserOrderByReservationEndDateDesc(User user, Pageable pageable);
     List<Reservation> findAllByReservationProperty(Property property);
     Optional<Reservation> findAllByReservationUserAndReservationPropertyAndReservationStartDateAndReservationEndDateIsBefore(User reservationUser, Property reservationProperty, LocalDateTime reservationStartDate, LocalDateTime afterDate);
 }

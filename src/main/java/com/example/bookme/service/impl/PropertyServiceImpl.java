@@ -137,6 +137,11 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public Optional<PropertyProjection> findByIdSmall(Long id) {
+        return propertyRepository.findPropertyByIdSmall(id);
+    }
+
+    @Override
     public Optional<Property> save(PropertySaveDto propertySaveDto, Authentication authentication) throws IOException {
         User propertyUser = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);

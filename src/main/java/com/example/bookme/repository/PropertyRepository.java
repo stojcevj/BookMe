@@ -21,6 +21,8 @@ import java.util.Optional;
 @Repository
 public interface PropertyRepository extends JpaRepository<Property, Long> {
     Page<Property> findAll(Pageable pageable);
+    @Query(value = "SELECT p.id, p.property_name, p.property_description, p.property_city, p.property_address, p.property_location, p.property_type, p.property_size, p.property_price, p.property_image, p.property_images FROM property p WHERE p.id = :propertyId", nativeQuery = true)
+    Optional<PropertyProjection> findPropertyByIdSmall(@Param("propertyId") Long propertyId);
     @Query(value = "SELECT p.id, p.property_name, p.property_description, p.property_city, p.property_address, p.property_location, p.property_type, p.property_size, p.property_price, p.property_image, p.property_images FROM property p", nativeQuery = true)
     List<PropertyProjection> findAllForMap();
     @Query(value = "SELECT p.id, p.property_name, p.property_description, p.property_city, p.property_address, p.property_location, p.property_type, p.property_size, p.property_price, p.property_image, p.property_images FROM property p WHERE p.property_user_id = :userId", nativeQuery = true)
