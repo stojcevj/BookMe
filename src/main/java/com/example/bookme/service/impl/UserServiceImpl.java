@@ -77,4 +77,9 @@ public class UserServiceImpl implements UserService {
 
         return Optional.of(userRepository.save(authenticatedUser));
     }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

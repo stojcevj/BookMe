@@ -6,6 +6,7 @@ import com.example.bookme.model.dtos.SignUpDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
@@ -13,4 +14,5 @@ public interface UserService extends UserDetailsService {
     Optional<User> save(SignUpDto sign);
     Optional<User> changePassword(Authentication authentication,
                                   ChangePasswordDto changePasswordDto) throws JsonProcessingException;
+    Optional<User> findByEmail(String email);
 }
